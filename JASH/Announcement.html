@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
+  <title>JAHS Admin Dashboard - Announcements</title>
+
+  <!-- Bootstrap 5 -->  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>  
+
+  <!-- Lordicon -->  
+  <script src="https://cdn.lordicon.com/lordicon.js"></script>  
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    body {  
+      font-family: "Segoe UI", sans-serif;  
+      background: linear-gradient(135deg, #e4e7f6, #f4f6fc);  
+      overflow: hidden;  
+      margin: 0;
+    }  
+
+    /* Sidebar */    
+    .sidebar {  
+      width: 250px;  
+      height: 100vh;  
+      position: fixed;  
+      top: 0; left: 0;  
+      background: linear-gradient(180deg, #2f3b8f, #1d2b64);  
+      color: #fff;  
+      padding-top: 60px;  
+      box-shadow: 2px 0 15px rgba(0,0,0,0.2);  
+    }  
+
+    .sidebar a {  
+      color: #fff;  
+      padding: 14px 20px;  
+      display: flex;  
+      align-items: center;  
+      text-decoration: none;  
+      transition: all 0.3s ease;  
+      font-size: .93rem; 
+    }  
+
+    .sidebar a:hover {  
+      background: rgba(255,255,255,0.2);  
+      transform: translateX(10px) scale(1.05);  
+      border-radius: 8px;  
+    }  
+
+    .sidebar lord-icon {  
+      width: 28px;  
+      height: 28px;  
+      margin-right: 12px;  
+      filter: brightness(0) invert(1);  
+      transition: transform 0.4s ease;  
+    }  
+
+    .sidebar a:hover lord-icon {  
+      transform: rotate(15deg) scale(1.3);  
+    }  
+
+    /* Navbar */  
+    .navbar {  
+      margin-left: 250px;  
+      transition: all 0.3s ease;  
+    }  
+
+    /* Main Content */  
+    .content {  
+      margin-left: 250px;  
+      margin-top: 56px; /* navbar height */  
+      height: calc(100vh - 56px);  
+      overflow-y: auto;  
+      padding: 20px;  
+      display: flex;  
+      flex-direction: column;  
+    }
+
+    #announcementForm textarea {
+      width: 100%;
+      height: 80px;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+
+    #announcementForm .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    #announcementForm button {
+      padding: 10px 15px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #announcementForm button:hover {
+      background-color: #1d4ed8;
+    }
+
+    #deleteSelectedBtn {
+      background-color: #dc2626;
+    }
+    #deleteSelectedBtn:hover {
+      background-color: #b91c1c;
+    }
+
+    .announcement {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background-color: #f9fafb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .timestamp {
+      color: #555;
+      font-size: 0.9em;
+      margin-top: 6px;
+    }
+
+    .announcement-checkbox { margin-right: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <img src="jahslogo.png" style="height: 100px; margin-left: 20px" alt="logo">
+    <a href="admin_dashboard.html">
+      <lord-icon src="https://cdn.lordicon.com/osuxyevn.json" trigger="hover"></lord-icon>
+      Dashboard
+    </a>
+    <a href="deployment.html">
+      <lord-icon src="https://cdn.lordicon.com/abwrkdvl.json" trigger="hover"></lord-icon>
+      Deployment
+    </a>
+    <a href="inventory.html">
+      <lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover"></lord-icon>
+      Inventory
+    </a>
+    <a href="salary.html">
+      <lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="hover"></lord-icon>
+      Payroll
+    </a>
+    <a href="Announcement.html">
+      <lord-icon src="https://cdn.lordicon.com/hpivxauj.json" trigger="hover"></lord-icon>
+      Announcement
+    </a>
+    <a href="Manage_account_dashboard.html">
+      <lord-icon src="https://cdn.lordicon.com/dklbhvrt.json" trigger="hover"></lord-icon>
+      Manage Accounts
+    </a>
+    <a href="#">--------- History Logs --------</a>
+    <a href="deployment_log.html">
+      <lord-icon src="https://cdn.lordicon.com/abwrkdvl.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>
+      Deployment History Log
+    </a>
+    <a href="inventory_log.html">
+      <lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>
+      Inventory History Log
+    </a>
+    <a href="salary_logs.html">
+      <lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>
+      Salary History Log
+    </a>
+    <a href="Reports.html">
+      <lord-icon src="https://cdn.lordicon.com/wloilxuq.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>
+      Report History Log
+    </a>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand ms-3 fw-bold" href="#">JAHS Telecon Employee Web Portal</a>
+      <div class="dropdown ms-auto me-3">
+        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+          <lord-icon src="https://cdn.lordicon.com/ajkxzzfb.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>
+          <span id="welcome">Loading...</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#">Account Info</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="#" id="logoutBtn">Log out</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="content">
+    <h2>Announcements</h2>
+
+    <!-- Back and Logout Buttons -->
+    <div class="mb-3" style="display: none;">
+      <button class="btn btn-secondary me-2" id="backButton" onclick="history.back()">Back</button>
+      <button class="btn btn-danger" id="logoutButton">Logout</button>
+    </div>
+
+    <!-- Announcement Form -->
+    <form id="announcementForm">
+      <textarea id="announcementText" placeholder="Write an announcement..."></textarea>
+      <div class="form-actions">
+        <button type="submit">Post Announcement</button>
+        <button type="button" id="deleteSelectedBtn" style="background-color: #dc2626;">Delete Selected</button>
+      </div>
+    </form>
+
+    <!-- Announcements List -->
+    <div id="announcementsList" style="margin-top:15px; flex:1; overflow-y:auto;"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const userName = localStorage.getItem("userName") || "Unknown";
+    const role = localStorage.getItem("role") || "visitor";
+    document.getElementById("welcome").innerHTML = `Welcome, ${userName} (${role})`;
+
+    const firebaseConfig = {
+      apiKey: "YOUR_FIREBASE_API_KEY", // <-- INSERT your correct API KEY here
+      authDomain: "jahsportal.firebaseapp.com",
+      databaseURL: "https://jahsportal-default-rtdb.firebaseio.com",
+      projectId: "jahsportal",
+      storageBucket: "jahsportal.firebasestorage.app",
+      messagingSenderId: "798312139932",
+      appId: "1:798312139932:web:2f6654cdd82a23406ff159"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const announcementsList = document.getElementById("announcementsList");
+    const announcementForm = document.getElementById("announcementForm");
+    const announcementText = document.getElementById("announcementText");
+    const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
+
+    // Render announcements
+    function renderAnnouncements() {
+      db.ref("announcements").on("value", snapshot => {
+        const data = snapshot.val() || {};
+        announcementsList.innerHTML = '';
+        Object.entries(data).forEach(([key, ann]) => {
+          const div = document.createElement("div");
+          div.className = "announcement";
+          div.innerHTML = `
+            <div>
+              <input type="checkbox" class="announcement-checkbox" data-key="${key}">
+              <strong>${ann.name ? ann.name : "Unknown"}</strong>: ${ann.text}
+              <div class="timestamp">${ann.timestamp}</div>
+            </div>
+          `;
+          announcementsList.appendChild(div);
+        });
+      });
+    }
+
+    // Post announcement
+    announcementForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const text = announcementText.value.trim();
+      const name = userName;
+      if(!text) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          text: 'Enter announcement text!'
+        });
+        return;
+      }
+      const timestamp = new Date().toLocaleString();
+      const newRef = db.ref("announcements").push();
+      newRef.set({
+        text,
+        name,
+        timestamp
+      })
+      .then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Posted!',
+          text: 'Announcement posted successfully.',
+          timer: 1500,
+          showConfirmButton: false
+        });
+        announcementText.value = '';
+      })
+      .catch(err => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: err.message
+        });
+      });
+    });
+
+    // Delete selected announcements
+    deleteSelectedBtn.addEventListener("click", () => {
+      const checkboxes = document.querySelectorAll(".announcement-checkbox:checked");
+      if(checkboxes.length === 0) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          text: 'No announcements selected!'
+        });
+        return;
+      }
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: `Delete ${checkboxes.length} selected announcement(s)?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#2563eb',
+        confirmButtonText: 'Yes, delete'
+      }).then((result) => {
+        if(result.isConfirmed) {
+          checkboxes.forEach(cb => db.ref("announcements/" + cb.dataset.key).remove());
+          Swal.fire({
+            icon: 'success',
+            title: 'Deleted!',
+            text: 'Selected announcements deleted.',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        }
+      });
+    });
+
+    document.getElementById("logoutButton").addEventListener("click", logout);
+    document.getElementById("logoutBtn").addEventListener("click", logout);
+
+    function logout() {
+      Swal.fire({
+        title: 'Logout',
+        text: 'Are you sure you want to logout?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#2563eb',
+        confirmButtonText: 'Yes, logout'
+      }).then((result) => {
+        if(result.isConfirmed) {
+          localStorage.clear();
+          window.location.href = "login.html";
+        }
+      });
+    }
+
+    renderAnnouncements();
+  </script>
+</body>
+</html>

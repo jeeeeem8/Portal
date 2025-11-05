@@ -1,0 +1,234 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: #f4f6f8;
+  color: #333;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+header h3 {
+  font-size: 1.5rem;
+}
+
+.logout-btn {
+  background-color: #ff4d4d;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #e60000;
+}
+
+/* Table */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 30px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+thead {
+  background-color: #007bff;
+  color: white;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  vertical-align: middle;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Deployment Days column */
+td.deployment-days {
+  font-weight: bold;
+  color: #444;
+  text-align: center;
+}
+
+/* Buttons inside table */
+td button {
+  margin: 2px 2px 2px 0;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 0.85rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.accept-btn {
+  background-color: #28a745;
+}
+.accept-btn:hover {
+  background-color: #218838;
+}
+
+.report-btn {
+  background-color: #ffc107;
+  color: #333;
+}
+.report-btn:hover {
+  background-color: #e0a800;
+}
+
+.complete-btn {
+  background-color: #17a2b8;
+}
+.complete-btn:hover {
+  background-color: #117a8b;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+}
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* Status Labels */
+.status-accepted {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.status-completed {
+  color: #17a2b8;
+  font-weight: bold;
+}
+
+.status-active {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.status-expired {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+/* Report Images Row */
+.report-images-row td {
+  background-color: #f9f9f9;
+  padding: 10px;
+  text-align: left;
+}
+
+.report-image {
+  max-height: 100px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Modal (Report Submission) */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  max-height: 80%;
+  overflow-y: auto;
+  width: 500px;
+}
+
+.modal-content h3 {
+  margin-bottom: 10px;
+}
+
+.modal-content textarea {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.modal-content input[type="file"] {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.modal-content button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #10b981;
+  color: #fff;
+}
+.modal-content button:hover {
+  background-color: #0f766e;
+}
+
+/* Buttons styling */
+button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: bold;
+  margin: 2px;
+  transition: 0.2s all;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+/* Specific buttons */
+button.accept-btn { background-color: #4caf50; } /* Green */
+button.report-btn { background-color: #ff9800; } /* Orange */
+button.complete-btn { background-color: #2196f3; } /* Blue */
+button.delete-btn { background-color: #f44336; } /* Red */
+

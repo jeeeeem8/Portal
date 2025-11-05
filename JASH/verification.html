@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Firebase Google Sign-In (Localhost Ready)</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 480px; margin: 50px auto; }
+    button { padding: 10px 20px; font-size: 16px; }
+    #user-info { margin-top: 20px; }
+    .hidden { display: none; }
+  </style>
+  <!-- Firebase SDK compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <h2>Google Sign In with Firebase</h2>
+  <button id="googleSignInBtn">Sign In with Google</button>
+  <div id="user-info" class="hidden">
+    <p id="name"></p>
+    <p id="email"></p>
+    <button id="signOutBtn">Sign Out</button>
+  </div>
+  <p id="message"></p>
+
+  <script>
+    // Your Firebase config - replace with your own config
+  const firebaseConfig = {
+  apiKey: "AIzaSyB1Gbmp2j2cTfnUmuWTjcL2ypauUpQn8Qc",
+  authDomain: "jahsportal.firebaseapp.com",
+  databaseURL: "https://jahsportal-default-rtdb.firebaseio.com",
+  projectId: "jahsportal",
+  storageBucket: "jahsportal.appspot.com",
+  messagingSenderId: "798312139932",
+  appId: "1:798312139932:web:2f6654cdd82a23406ff159"
+};
+
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    } 
+    const auth = firebase.auth();
+
+    // DOM elements
+    const signInBtn = document.getElementById('googleSignInBtn');
+    const signOutBtn = document.getElementById('signOutBtn');
+    const userInfo = document.getElementById('user-info');
+    const nameEl = document.getElementById('name');
+    const emailEl = document.getElementById('email');
+    const msgEl = document.getElementById('message');
+
+    // Sign in
+    signInBtn.addEventListener('click', () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          nameEl.textContent = `Hello, ${user.displayName}`;
+          emailEl.textContent = `Email: ${user.email}`;
+          userInfo.classList.remove('hidden');
+          signInBtn.classList.add('hidden');
+          msgEl.textContent = "Signed in successfully!";
+        })
+        .catch(error => {
+          console.error(error);
+          msgEl.textContent = "Failed to sign in.";
+        });
+    });
+
+    // Sign out
+    signOutBtn.addEventListener('click', () => {
+      auth.signOut()
+        .then(() => {
+          userInfo.classList.add('hidden');
+          signInBtn.classList.remove('hidden');
+          msgEl.textContent = "Signed out successfully!";
+        })
+        .catch(error => {
+          console.error(error);
+          msgEl.textContent = "Failed to sign out.";
+        });
+    });
+
+    // Auth state listener
+    auth.onAuthStateChanged(user => {
+      if(user) {
+        nameEl.textContent = `Hello, ${user.displayName}`;
+        emailEl.textContent = `Email: ${user.email}`;
+        userInfo.classList.remove('hidden');
+        signInBtn.classList.add('hidden');
+        msgEl.textContent = "Welcome back!";
+      } else {
+        userInfo.classList.add('hidden');
+        signInBtn.classList.remove('hidden');
+        msgEl.textContent = "";
+      }
+    });
+  </script>
+</body>
+</html>

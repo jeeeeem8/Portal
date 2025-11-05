@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Employee & Team Leader Payroll</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Lordicon -->
+  <script src="https://cdn.lordicon.com/lordicon.js"></script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Firebase compat (same style used in your project) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    /* Page base */
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #edf2fb, #e2e9ff);
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar */
+     .sidebar {  
+      width: 250px;  
+      height: 100vh;  
+      position: fixed;  
+      top: 0; left: 0;  
+      background: linear-gradient(180deg, #2f3b8f, #1d2b64);  
+      color: #fff;  
+      padding-top: 60px;  
+      box-shadow: 2px 0 15px rgba(0,0,0,0.2);  
+    }  
+
+    .sidebar a {  
+      color: #fff;  
+      padding: 14px 20px;  
+      display: flex;  
+      align-items: center;  
+      text-decoration: none;  
+      transition: all 0.3s ease;  
+      font-size: .93rem; 
+    }  
+
+    .sidebar a:hover {  
+      background: rgba(255,255,255,0.2);  
+      transform: translateX(10px) scale(1.05);  
+      border-radius: 8px;  
+    }  
+
+    .sidebar lord-icon {  
+      width: 28px;  
+      height: 28px;  
+      margin-right: 12px;  
+      filter: brightness(0) invert(1);  
+      transition: transform 0.4s ease;  
+    }  
+
+    .sidebar a:hover lord-icon {  
+      transform: rotate(15deg) scale(1.3);  
+    }  
+    /* Navbar */
+    .navbar {
+      margin-left:250px;
+      background: #ffffffcc;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    #liveDateTime { color:#2a3aa0; font-weight:600; font-size:.95rem; }
+
+    /* Content area */
+    .content {
+      margin-left:250px;
+      padding:28px;
+      min-height: calc(100vh - 120px);
+    }
+
+    /* Salary container */
+    #salaryContainer {
+      width: 100%;
+      background: #fff;
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    }
+
+    .cutoff-display h3 { margin:0; color:#1a237e; }
+
+    .search-container { display:flex; gap:10px; margin-top:12px; align-items:center; }
+    .search-container input { flex:1; padding:9px 10px; border-radius:8px; border:1px solid #ccd6f2; }
+    .search-btn { background:#3a4bbf; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:600; }
+
+    .post-btn, .delete-btn, .back-btn, .history-btn { margin-right:8px; padding:8px 14px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+    .post-btn { background:#28a745; color:#fff; } .delete-btn { background:#dc3545; color:#fff; } .back-btn { background:#6c757d; color:#fff; } .history-btn { background:#0d6efd; color:#fff; }
+
+    /* grouped tables */
+    .salaryTable { width:100%; border-collapse: collapse; margin-top:14px; font-size:14px; }
+    .salaryTable thead th { background:#3a4bbf; color:#fff; padding:10px; text-align:center; }
+    .salaryTable tbody td { padding:10px; border:1px solid #e9eefc; text-align:center; vertical-align:middle; }
+    .salaryTable tbody tr:nth-child(even) { background:#fbfdff; }
+
+    footer { margin-left:250px; padding:18px; text-align:center; color:#555; }
+
+    /* responsive */
+    @media (max-width:900px){
+      .sidebar { width:72px; padding-top:20px; }
+      .navbar, .content, footer { margin-left:72px; }
+      .sidebar img { display:none; }
+      .sidebar a { padding:8px; font-size:.9rem; }
+      .search-container { flex-direction:column; align-items:stretch; }
+      .post-btn, .delete-btn, .back-btn, .history-btn { width:100%; margin-bottom:8px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <img src="jahslogo.png" style="height: 100px; margin-left: 20px" alt="logo">
+    <a href="admin_dashboard.html">
+      <lord-icon src="https://cdn.lordicon.com/osuxyevn.json" trigger="hover"></lord-icon>
+      Dashboard
+    </a>
+    <a href="deployment.html">
+      <lord-icon src="https://cdn.lordicon.com/abwrkdvl.json" trigger="hover"></lord-icon>
+      Deployment
+    </a>
+    <a href="inventory.html">
+      <lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover"></lord-icon>
+      Inventory
+    </a>
+    <a href="salary.html">
+      <lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="hover"></lord-icon>
+      Payroll
+    </a>
+    <a href="Announcement.html">
+      <lord-icon src="https://cdn.lordicon.com/hpivxauj.json" trigger="hover"></lord-icon>
+      Announcement
+    </a>
+    <a href="Manage_account_dashboard.html">
+      <lord-icon src="https://cdn.lordicon.com/dklbhvrt.json" trigger="hover"></lord-icon>
+      Manage Accounts
+    </a>
+    <a href="#">--------- History Logs --------</a>
+
+    <a href="deployment_log.html">
+  <lord-icon
+      src="https://cdn.lordicon.com/abwrkdvl.json"
+      trigger="hover"
+      style="width:28px;height:28px;margin-right:8px;">
+  </lord-icon>
+  Deployment History Log
+</a>
+
+<a href="inventory_log.html">
+  <lord-icon
+      src="https://cdn.lordicon.com/hwuyodym.json"
+      trigger="hover"
+      style="width:28px;height:28px;margin-right:8px;">
+  </lord-icon>
+  Inventory History Log
+</a>
+
+<a href="salary_logs.html">
+  <lord-icon
+      src="https://cdn.lordicon.com/qhgmphtg.json"
+      trigger="hover"
+      style="width:28px;height:28px;margin-right:8px;">
+  </lord-icon>
+  Salary History Log
+</a>
+
+<a href="Reports.html">
+  <lord-icon
+      src="https://cdn.lordicon.com/wloilxuq.json"
+      trigger="hover"
+      style="width:28px;height:28px;margin-right:8px;">
+  </lord-icon>
+  Report History Log
+</a>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand ms-3 fw-bold" href="#">JAHS Telecon Employee Web Portal</a>
+      <div class="dropdown ms-auto me-3">
+        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+          <lord-icon src="https://cdn.lordicon.com/ajkxzzfb.json" trigger="hover" style="width:28px;height:28px;margin-right:8px" colors="primary:#3a4bbf,secondary:#3a4bbf"></lord-icon>
+          <span id="welcome">Loading...</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="#" onclick="logout()">Log out</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <div class="content mt-5 pt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="fw-bold">Payroll Management</h3>
+      <div id="liveDateTime"></div>
+    </div>
+
+    <!-- Salary container -->
+    <div id="salaryContainer"></div>
+  </div>
+
+  <footer>
+    <p>© 2025 Company Payroll System</p>
+  </footer>
+
+  <!-- Hidden element expected by some code -->
+  <button id="logoutBtn" style="display:none"></button>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Live date/time and logout helper -->
+  <script>
+    function logout() {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will be logged out of the system.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3a4bbf",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, log out",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.clear();
+          Swal.fire({ title: "Logged out!", text: "Redirecting...", icon: "success", timer: 1000, showConfirmButton:false });
+          setTimeout(()=> window.location.href = "welcome_page.html", 1100);
+        }
+      });
+    }
+
+    function updateLiveDateTime(){
+      const now = new Date();
+      const day = now.toLocaleDateString("en-US",{weekday:"long"});
+      const date = now.toLocaleDateString("en-US");
+      const time = now.toLocaleTimeString("en-US");
+      document.getElementById("liveDateTime").textContent = `${day}, ${date} ${time}`;
+    }
+    setInterval(updateLiveDateTime,1000);
+    updateLiveDateTime();
+  </script>
+
+  <!-- Payroll logic -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // ==============================
+      // Employee + Team Leader Payroll
+      // ==============================
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyB1Gbmp2j2cTfnUmuWTjcL2ypauUpQn8Qc",
+        authDomain: "jahsportal.firebaseapp.com",
+        databaseURL: "https://jahsportal-default-rtdb.firebaseio.com",
+        projectId: "jahsportal",
+        storageBucket: "jahsportal.firebasestorage.app",
+        messagingSenderId: "798312139932",
+        appId: "1:798312139932:web:2f6654cdd82a23406ff159"
+      };
+
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+
+      const salaryContainer = document.getElementById("salaryContainer");
+      const welcome = document.getElementById("welcome");
+      const logoutBtn = document.getElementById("logoutBtn");
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => { localStorage.clear(); window.location.href = "welcome_page.html"; });
+      }
+
+      const userName = localStorage.getItem("userName");
+      const role = localStorage.getItem("role");
+
+      if (!userName || (role !== "admin" && role !== "teamleader")) {
+        // use Swal then redirect
+        Swal.fire({
+          icon: "error",
+          title: "Access denied",
+          text: "Only Admin or Team Leader can view payroll. Redirecting...",
+          timer: 1800,
+          showConfirmButton: false
+        }).then(() => {
+          window.location.href = "welcome_page.html";
+        });
+        return; // stop further initialization
+      }
+
+      welcome.innerHTML = `<small style="margin:0; font-weight:600">Welcome, ${userName} (${role})</small>`;
+
+      const DAILY_RATE_EMP = 600;
+      const DAILY_RATE_TL = 800;
+
+
+
+      
+      // Create table and controls
+
+      function createTable(){
+  const now = new Date();
+  const today = now.getDate();
+
+  // Define your cutoff days in a cycle
+  const cutoff1 = 10;
+  const cutoff2 = 25;
+
+  let cutoffDay;
+  let cutoffMonth = now.getMonth();
+  let cutoffYear = now.getFullYear();
+
+  if (today <= cutoff1) {
+    cutoffDay = cutoff1;
+  } else if (today <= cutoff2) {
+    cutoffDay = cutoff2;
+  } else {
+    // Passed cutoff2, so cutoff shifts to next month's cutoff1 (10th)
+    cutoffDay = cutoff1;
+    cutoffMonth += 1;
+    if (cutoffMonth > 11) { // Dec -> Jan next year
+      cutoffMonth = 0;
+      cutoffYear += 1;
+    }
+  }
+
+  const cutoffDate = new Date(cutoffYear, cutoffMonth, cutoffDay);
+  const cutoffText = cutoffDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  salaryContainer.innerHTML = `
+    <div class="cutoff-display"><h3>Salary Cutoff: ${cutoffText}</h3></div>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search by name..." />
+      <button id="searchBtn" class="search-btn">Search</button>
+    </div>
+
+    <div id="payrollTableContainer" class="mb-4"></div>
+
+    <div class="action-buttons d-flex justify-content-end gap-2 mt-2">
+      <button id="postSelectedBtn" class="post-btn">Post Selected</button>
+      <button id="deleteSelectedBtn" class="delete-btn">Delete Selected</button>
+      <button id="historyBtn" class="history-btn">Salary History</button>
+      <button id="backBtn" class="back-btn">Back</button>
+    </div>
+  `;
+
+  document.getElementById("postSelectedBtn").addEventListener("click", postSelected);
+  document.getElementById("deleteSelectedBtn").addEventListener("click", deleteSelected);
+  document.getElementById("searchBtn").addEventListener("click", searchPayroll);
+  document.getElementById("backBtn").addEventListener("click", () => window.history.back());
+  document.getElementById("historyBtn").addEventListener("click", () => window.location.href = "salary_logs.html");
+}
+
+
+      // Load payroll
+      function loadPayroll() {
+        const container = document.getElementById("payrollTableContainer");
+        container.innerHTML = '';
+
+        db.ref("accounts").once("value").then(accountsSnap => {
+          const accountData = {};
+          accountsSnap.forEach(acc => {
+            const data = acc.val();
+            if (!data) return;
+            if (data.role === "employee" || data.role === "teamleader") {
+              accountData[data.name] = {
+                id: acc.key,
+                name: data.name,
+                role: data.role === "teamleader" ? "Team Leader" : "Employee",
+                dailyRate: data.role === "teamleader" ? DAILY_RATE_TL : DAILY_RATE_EMP
+              };
+            }
+          });
+
+          return db.ref("salary").once("value").then(salarySnap => {
+            const payrollData = [];
+            salarySnap.forEach(child => {
+              const salaryRec = child.val();
+              if (!salaryRec) return;
+
+              const key = child.key;
+              const deploymentId = salaryRec.deploymentId || key;
+
+              // Skip records without proper dates
+              if (!salaryRec.startDate || !salaryRec.endDate) return;
+
+             const startDate = salaryRec.startDate || salaryRec.createdAt || new Date().toISOString().split("T")[0];
+             const endDate = salaryRec.endDate || startDate;
+              const deploymentDays = salaryRec.deploymentDays || calculateDays(startDate, endDate);
+
+             // Team Leader
+if (salaryRec.teamLeader && accountData[salaryRec.teamLeader]) {
+  const tlStart = salaryRec.teamLeaderStartDate || salaryRec.startDate;
+  const tlEnd = salaryRec.teamLeaderEndDate || salaryRec.endDate;
+  const tlDays = salaryRec.teamLeaderDeploymentDays || calculateDays(tlStart, tlEnd);
+
+  payrollData.push({
+    salaryKey: key,
+    deploymentId,
+    name: salaryRec.teamLeader,
+    role: "Team Leader",
+    dailyRate: DAILY_RATE_TL,
+    totalDays: tlDays,
+    startDate: tlStart,
+    endDate: tlEnd
+  });
+}
+
+// Employees
+if (Array.isArray(salaryRec.employees)) {
+  salaryRec.employees.forEach(emp => {
+    const empName = typeof emp === "string" ? emp : emp.name;
+    const empStart = emp.startDate || salaryRec.startDate;
+    const empEnd = emp.endDate || salaryRec.endDate;
+    const empDays = emp.deploymentDays || calculateDays(empStart, empEnd);
+
+    payrollData.push({
+      salaryKey: key,
+      deploymentId,
+      name: empName,
+      role: "Employee",
+      dailyRate: DAILY_RATE_EMP,
+      totalDays: empDays,
+      startDate: empStart,
+      endDate: empEnd
+    });
+  });
+}
+
+
+            });
+
+            renderGroupedTables(payrollData);
+            enableSelectAll();
+          });
+        }).catch(err => {
+          console.error("Error loading payroll:", err);
+          Swal.fire("Error", "Could not load payroll data.", "error");
+        });
+      }
+
+      // Calculate inclusive days between two dates
+      function calculateDays(start, end) {
+        const s = new Date(start);
+        const e = new Date(end);
+        // normalize to midnight to avoid DST/time differences
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const startDay = Date.UTC(s.getFullYear(), s.getMonth(), s.getDate());
+        const endDay = Date.UTC(e.getFullYear(), e.getMonth(), e.getDate());
+        const diffDays = Math.floor((endDay - startDay) / msPerDay) + 1;
+        return diffDays > 0 ? diffDays : 0;
+      }
+
+      // Render grouped tables (grouped by cutoff/endDate)
+      function renderGroupedTables(data) {
+        const container = document.getElementById("payrollTableContainer");
+        container.innerHTML = '';
+        const grouped = {};
+        data.forEach(record => {
+          const cutoff = new Date(record.endDate).toDateString();
+          if (!grouped[cutoff]) grouped[cutoff] = [];
+          grouped[cutoff].push(record);
+        });
+
+        Object.keys(grouped).sort((a,b)=>new Date(a)-new Date(b)).forEach(dateStr => {
+          const group = grouped[dateStr];
+          const header = document.createElement("h4");
+          header.className = "mt-4 mb-2 text-primary fw-bold";
+          header.textContent = new Date(dateStr).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+          container.appendChild(header);
+
+          const table = document.createElement("table");
+          table.className = "table table-striped table-hover table-bordered salaryTable";
+          table.innerHTML = `
+            <thead class="table-dark">
+              <tr>
+                <th style="width:40px;"><input type="checkbox" class="selectAllTable"></th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Daily Rate</th>
+                <th>Total Days</th>
+                <th>Total Salary</th>
+                <th>Period</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          `;
+          const tbody = table.querySelector("tbody");
+          group.forEach(record => addPayrollRowUI(record, tbody));
+          container.appendChild(table);
+        });
+      }
+
+      // Add row UI
+      function addPayrollRowUI(record, tbody) {
+        const start = new Date(record.startDate);
+        const end = new Date(record.endDate);
+        const totalDays = parseInt(record.totalDays) || 0;
+        const totalSalary = totalDays * record.dailyRate;
+
+        const formatDate = (d) => `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="text-center"><input type="checkbox" class="rowSelect"
+            data-deployment="${record.deploymentId}"
+            data-name="${record.name}"
+            data-role="${record.role}"
+            data-daily="${record.dailyRate}"
+            data-total="${totalSalary}"
+            data-days="${totalDays}"
+            data-start="${formatDate(start)}"
+            data-end="${formatDate(end)}"
+          ></td>
+          <td>${escapeHtml(record.name)}</td>
+          <td>${escapeHtml(record.role)}</td>
+          <td>₱${Number(record.dailyRate).toLocaleString()}</td>
+          <td>${totalDays}</td>
+          <td>₱${Number(totalSalary).toLocaleString()}</td>
+          <td>${formatDate(start)} to ${formatDate(end)}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      // escape HTML helper
+      function escapeHtml(str) {
+        return String(str||'').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+      }
+
+      // Select All functionality
+      function enableSelectAll() {
+        document.querySelectorAll(".selectAllTable").forEach(checkbox => {
+          checkbox.addEventListener("change", e => {
+            const table = e.target.closest("table");
+            table.querySelectorAll(".rowSelect").forEach(cb => cb.checked = e.target.checked);
+          });
+        });
+      }
+
+      // Post selected records
+      async function postSelected() {
+  const selected = Array.from(document.querySelectorAll(".rowSelect:checked"));
+  if (selected.length === 0) {
+    Swal.fire({ icon: "info", title: "No records selected.", timer: 1400, showConfirmButton: false });
+    return;
+  }
+
+  try {
+    // First, push all selected records
+    const postOps = selected.map(cb => {
+      const deploymentId = cb.dataset.deployment;
+      const rowData = {
+        name: cb.dataset.name,
+        role: cb.dataset.role || "Employee",
+        dailyRate: parseInt(cb.dataset.daily),
+        totalDays: parseInt(cb.dataset.days),
+        totalSalary: parseInt(cb.dataset.total),
+        startDate: cb.dataset.start,
+        endDate: cb.dataset.end,
+        deploymentId
+      };
+
+      const now = new Date();
+      rowData.postedAt = now.toISOString();
+      rowData.postedDate = now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+      return db.ref("posted_salary_record").push(rowData);
+    });
+
+    await Promise.all(postOps);
+
+    // After posting all selected, remove *all* entries from /salary node
+    await db.ref("salary").remove();
+
+    // Remove posted rows from UI
+    selected.forEach(cb => cb.closest("tr").remove());
+
+    Swal.fire("Posted!", "Selected records posted and all salary records cleared.", "success");
+
+    // Optionally reload your data here, e.g., loadPayroll();
+
+  } catch (error) {
+    console.error("Error during postSelected:", error);
+    Swal.fire("Error", "Failed to post salary records or clear data. Check console.", "error");
+  }
+}
+
+
+      // Delete selected records
+      function deleteSelected() {
+        const selected = document.querySelectorAll(".rowSelect:checked");
+        if (!selected.length) {
+          Swal.fire({ icon: "info", title: "No records selected.", timer: 1400, showConfirmButton: false});
+          return;
+        }
+
+        Swal.fire({
+          title: "Delete selected records?",
+          text: "They will be saved to Deleted Payroll.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, delete",
+          cancelButtonText: "Cancel",
+        }).then(result => {
+          if (!result.isConfirmed) return;
+
+          const ops = [];
+          selected.forEach(cb => {
+            const deploymentId = cb.dataset.deployment;
+            ops.push(
+              db.ref("salary").orderByChild("deploymentId").equalTo(deploymentId).once("value").then(snap => {
+                const innerOps = [];
+                snap.forEach(child => {
+                  const data = child.val();
+                  innerOps.push(db.ref("deleted_payroll").push({ ...data, deletedAt: new Date().toISOString() }));
+                  innerOps.push(db.ref("salary").child(child.key).remove());
+                });
+                return Promise.all(innerOps);
+              })
+            );
+            cb.closest("tr").remove();
+          });
+
+          Promise.all(ops).then(() => {
+            Swal.fire("Deleted!", "Selected records deleted and saved to Deleted Payroll.", "success");
+          }).catch(err => {
+            console.error(err);
+            Swal.fire("Error", "Failed to delete some records. Check console.", "error");
+          });
+        });
+      }
+
+      // Search payroll
+      function searchPayroll() {
+        const searchValue = document.getElementById("searchInput").value.trim().toLowerCase();
+        document.querySelectorAll("#payrollTableContainer table tbody tr").forEach(row => {
+          const name = (row.cells[1]?.innerText || "").toLowerCase();
+          row.style.display = (!searchValue || name.includes(searchValue)) ? "" : "none";
+        });
+      }
+
+      // initialize UI and load data
+      createTable();
+      loadPayroll();
+    });
+  </script>
+</body>
+</html>

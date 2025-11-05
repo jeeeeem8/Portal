@@ -1,0 +1,93 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+}
+
+form {
+  margin: 15px 0;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+input, select, button {
+  padding: 8px;
+  font-size: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+table th, table td {
+  padding: 10px;
+  text-align: center;
+}
+
+button {
+  cursor: pointer;
+  padding: 6px 10px;
+}
+
+/* ----------------- Inventory History Button ----------------- */
+#toggleHistoryBtn {
+  padding: 8px 16px;
+  background-color: #2563eb; /* Blue */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+  margin-bottom: 10px;
+}
+
+#toggleHistoryBtn:hover {
+  background-color: #1d4ed8;
+}
+
+/* ----------------- Inventory History Container ----------------- */
+#inventoryHistoryContainer {
+  background-color: #f9fafb; /* light gray background */
+  border: 1px solid #e5e7eb; /* subtle border */
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* ----------------- Inventory History Table ----------------- */
+#inventoryHistoryTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+}
+
+#inventoryHistoryTable th,
+#inventoryHistoryTable td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+#inventoryHistoryTable th {
+  background-color: #1e40af; /* dark blue */
+  color: white;
+  position: sticky;
+  top: 0;
+}
+
+#inventoryHistoryTable tr:nth-child(even) {
+  background-color: #f3f4f6;
+}
+
+#inventoryHistoryTable tr:hover {
+  background-color: #e0e7ff; /* soft blue highlight */
+}

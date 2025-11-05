@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e2a78 0%, #4e54c8 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .top_navbar {
+            height: 60px;
+            background-color: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .navigator ul {
+            display: flex;
+            list-style: none;
+            margin-left: auto;
+        }
+        
+        .navigator ul li {
+            margin-left: 1.5rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .navigator ul li:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .main {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+        
+        .sidepanel {
+            width: 280px;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .sidepanel h1 {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .divider {
+            width: 80%;
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.3);
+            margin: 1.5rem 0;
+        }
+        
+        .logout-btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: #4e54c8;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 80%;
+        }
+        
+        .logout-btn:hover {
+            background-color: #fff;
+            color: #4e54c8;
+        }
+        
+        .dashboard-container {
+            flex: 1;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+        
+        .quick-access {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .access-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 150px;
+        }
+        
+        .access-card:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .access-card img {
+            margin-bottom: 1rem;
+        }
+        
+        .access-card h3 {
+            font-size: 1rem;
+            text-align: center;
+        }
+        
+        .calendar-container {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 1.5rem;
+            height: fit-content;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .calendar-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .current-date {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .day-name {
+            font-weight: bold;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .today {
+            background-color: #4e54c8;
+            font-weight: bold;
+        }
+        
+        .other-month {
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="top_navbar">
+        <nav class="navigator">
+            <div>
+                <ul>               
+                    <li class="home" onclick="openPopup()">News</li>
+                    <li onclick="openPopup()">About JAHS Telecon</li>
+                    <li onclick="openPopup()">Contacts</li>               
+                </ul>
+            </div>
+        </nav>
+    </div>
+    
+    <div class="main">
+        <div class="sidepanel">
+            <div class="photo">
+                <img src="https://placehold.co/120x120" alt="Admin profile picture - professional headshot of a business person" />
+            </div>
+            <h1>Welcome Admin!</h1>
+            <div class="divider"></div>
+            <a href="welcome_page.html" class="logout-btn" onclick="logout()">Log out</a>
+        </div>
+        
+        <div class="dashboard-container">
+            <div class="quick-access">
+                <div class="access-card" id="deployment">
+                    <img src="deployment.png" alt="Deployment icon - cloud computing and network visualization" />
+                   
+                </div>
+                <div class="access-card">
+                   <a href="Manage_account_dashboard.html"><img src="accounts.png"></a>
+                </div>
+                <div class="access-card" id="manage_pay_roll">
+                    <img src="payroll.png" alt="Payroll icon - dollar bills and calculator" />
+                    <
+                </div>
+                <div class="access-card" id="manage_inventory">
+                    <img src="inventory.png" alt="Inventory icon - warehouse shelves with boxes" />
+                   
+                </div>
+            </div>
+            
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-title">Calendar</div>
+                    <div class="current-date" id="current-date">June 2023</div>
+                </div>
+                <div class="calendar-grid" id="calendar">
+                    <!-- Calendar will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize calendar
+            renderCalendar();
+            
+            // Update current date display
+            updateCurrentDate();
+            
+            // Set interval to update time every second
+            setInterval(updateCurrentDate, 1000);
+        });
+
+        function renderCalendar() {
+            const calendarEl = document.getElementById('calendar');
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const today = now.getDate();
+            
+            // Get first day of month and days in month
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Get days in previous month
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            
+            // Clear calendar
+            calendarEl.innerHTML = '';
+            
+            // Add day names
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayNames.forEach(day => {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'day-name';
+                dayEl.textContent = day;
+                calendarEl.appendChild(dayEl);
+            });
+            
+            // Add days from previous month
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day other-month';
+                dayEl.textContent = daysInPrevMonth - i;
+                calendarEl.appendChild(dayEl);
+            }
+            
+            // Add days in current month
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day';
+                dayEl.textContent = i;
+                
+                if (i === today) {
+                    dayEl.classList.add('today');
+                }
+                
+                calendarEl.appendChild(dayEl);
+            }
+            
+            // Calculate remaining cells to fill the grid (42 cells total - 7 days * 6 weeks)
+            const remainingCells = 42 - (firstDay + daysInMonth);
+            
+            // Add days from next month
+            for (let i = 1; i <= remainingCells; i++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day other-month';
+                dayEl.textContent = i;
+                calendarEl.appendChild(dayEl);
+            }
+        }
+
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { month: 'long', year: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options) + ' ' + now.toLocaleTimeString();
+        }
+
+        function openPopup() {
+            alert('Feature coming soon!');
+        }
+
+        function logout() {
+            // In a real app, this would redirect to logout endpoint
+            alert('Logging out...');
+        }
+    </script>
+</body>
+</html>

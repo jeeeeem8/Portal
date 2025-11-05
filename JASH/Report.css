@@ -1,0 +1,228 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #eef2ff, #f8f9fc);
+  overflow: hidden;
+  margin: 0;
+  color: #2c3e50;
+}
+
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  top: 0; left: 0;
+  background: linear-gradient(180deg, #2f3b8f, #1d2b64);
+  color: #fff;
+  padding-top: 60px;
+  box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.sidebar a {
+  color: #fff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: .93rem;
+}
+
+.sidebar a:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateX(10px) scale(1.05);
+  border-radius: 8px;
+}
+
+.sidebar lord-icon {
+  width: 28px;
+  height: 28px;
+  margin-right: 12px;
+  filter: brightness(0) invert(1);
+  transition: transform 0.4s ease;
+}
+
+.sidebar a:hover lord-icon {
+  transform: rotate(15deg) scale(1.3);
+}
+
+.navbar {
+  margin-left: 250px;
+  transition: all 0.3s ease;
+  background: #ffffffcc;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+
+.content {
+  margin-left: 250px;
+  margin-top: 70px;
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+  padding: 20px 40px;
+}
+
+.report {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e0e3ff;
+  position: relative;
+
+  max-width: 100%;
+  max-height: 420px;
+  overflow: auto;
+  min-width: 290px;
+}
+
+.report:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+.report strong {
+  color: #1a237e;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: #ff5252;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.delete-btn:hover {
+  background-color: #d32f2f;
+}
+
+.map {
+  width: 100%;
+  height: 250px;
+  margin-top: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.images {
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.images img {
+  max-width: 130px;
+  max-height: 130px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid #d1d9ff;
+  transition: transform 0.3s ease;
+  display: inline-block;
+  margin-right: 6px;
+}
+.images img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+#printBtn {
+  margin-bottom: 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 5px 15px rgba(63,81,181,0.25);
+}
+
+.select-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+#searchInput {
+  padding: 10px 15px;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+}
+
+/* PRINT STYLES -- Apply for physical/pdf print */
+@media print {
+  body, html {
+    background: #fff !important;
+    color: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .sidebar, .navbar, .btn, .delete-btn, .form-check, input[type="checkbox"], .select-label, .img-clickable, .map, #selectAllReports, #printBtn, #searchInput {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+  }
+  .content {
+    margin: 0 !important;
+    padding: 0.2in !important;
+  }
+  #reportsContainer, .report {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0.15in !important;
+    background: #fff !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+  .report {
+    border: none !important;
+    margin-bottom: 0.22in !important;
+    page-break-inside: avoid !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  .report strong, .report span {
+    color: #222 !important;
+    font-weight: bold !important;
+  }
+  img {
+    max-width: 4in !important;
+    height: auto !important;
+    page-break-inside: avoid !important;
+  }
+  p, label, span, strong, div {
+    font-size: 12pt !important;
+    color: #000 !important;
+    background: none !important;
+    text-align: left !important;
+    line-height: 1.4 !important;
+    margin: 0 0 6px 0 !important;
+    padding: 0 !important;
+  }
+  h1, h2, h3, h4 {
+    color: #111 !important;
+    padding-bottom: 0.06in !important;
+    margin-bottom: 0.06in !important;
+    font-weight: bold !important;
+  }
+  .modal, .modal-backdrop, #imageModal, .footer, header {
+    display: none !important;
+  }
+}

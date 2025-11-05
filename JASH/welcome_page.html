@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAHS Telecon Portal</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+ <link rel="stylesheet" href="welcome_page.css">
+    
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <button id="login">Login</button>
+  </nav>
+
+  <!-- Slider -->
+  <div class="slider-container">
+    <div class="slides">
+      <img src="bg1.png" alt="Slide 1">
+      <img src="bg2.png" alt="Slide 2">
+      <img src="bg3.png" alt="Slide 3">
+      <img src="bg4.png" alt="Slide 4">
+    </div>
+    <div class="right-card">
+      <img src="logowebb.png" style="height: 130px; ">
+      <h1>Login</h1>
+      <form id="universalLoginForm">
+        <div class="input-group">
+          <input type="email" id="login_email" placeholder=" " required>
+          <label for="login_email">Email</label>
+        </div>
+        <div class="input-group">
+          <input type="password" id="login_password" placeholder=" " required>
+          <label for="login_password">Password</label>
+          <span class="toggle-password" onclick="togglePassword()" style="color: white;">👁</span>
+        </div>
+        <button type="submit">Sign In</button>
+      </form>
+      <img src="qrcode.png  " style="height: 330px; ">
+    </div>
+    <button class="center-button" id="join">Join our Team!</button>
+  </div>
+
+  <!-- Footer -->
+
+
+  <!-- Join Popup -->
+  <div class="popup_overlay" id="pop_join">
+    <div class="popup_box">
+      <span class="close" id="closeJoin">&times;</span>
+      <div class="popup_left">
+        <iframe 
+          src="https://www.google.com/maps?q=14.8070035,120.8683621&hl=es;z=14&output=embed"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <div class="popup_right">
+        <h2>Join Our Team</h2>
+        <form id="joinForm">
+          <label for="join_email">Email:</label>
+          <input type="email" id="join_email" required>
+          <label for="join_email">Contact Number:</label>
+           <input type="contact_num" id="contact_num" required>
+          <label for="join_message">Message Us:</label>
+          <textarea id="join_message" rows="4" required></textarea>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Popup -->
+  <div id="pop_login" class="popup_overlay">
+    <div class="login_box">
+      <span class="close" style="color: white;">&times;</span>
+      <h2>Login</h2>
+      <form id="universalLoginForm">
+        <input type="email" id="login_email_popup" placeholder="Email" required><br><br>
+        <div style="position:relative;">
+          <input type="password" id="login_password_popup" placeholder="Password" required>
+          <span class="toggle-password" onclick="togglePasswordPopup()">👁</span>
+        </div><br>
+        <button type="submit">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <!-- JS for Slider -->
+  <script>
+    const slides = document.querySelector('.slides');
+    const slideCount = document.querySelectorAll('.slides img').length;
+    let index = 0;
+
+    function showNextSlide(interval) {
+      setTimeout(function changeSlide() {
+        index = (index + 1) % slideCount;
+        slides.style.transform = `translateX(${-index * 100}%)`;
+        const nextInterval = (index === 0) ? 6000 : 4000;
+        showNextSlide(nextInterval);
+      }, interval);
+    }
+    showNextSlide(6000);
+
+    function togglePassword() {
+      const pass = document.getElementById("login_password");
+      pass.type = pass.type === "password" ? "text" : "password";
+    }
+    function togglePasswordPopup() {
+      const pass = document.getElementById("login_password_popup");
+      pass.type = pass.type === "password" ? "text" : "password";
+    }
+  </script>
+
+  <!-- Custom JS for Login & Join -->
+  <script src="login.js"></script>
+</body>
+</html>

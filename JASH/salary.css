@@ -1,0 +1,179 @@
+/* -------------------------
+   RESET & BASE STYLES
+------------------------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+body {
+  background-color: #f4f6f8;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background-color: #1e90ff;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+header h1 {
+  font-size: 1.5rem;
+}
+
+header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logout-btn {
+  background-color: #ff4d4f;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #e63c3c;
+}
+
+main {
+  flex: 1;
+  padding: 20px;
+}
+
+.search-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.search-container input {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.search-container button {
+  padding: 7px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #1e90ff;
+  color: #fff;
+  transition: 0.2s;
+}
+
+.search-container button:hover {
+  background-color: #006fd6;
+}
+
+.salaryTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.salaryTable th, .salaryTable td {
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.salaryTable th {
+  background-color: #1e90ff;
+  color: #fff;
+}
+
+.salaryTable tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.salaryTable tr.deleted {
+  background-color: #ffdddd;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+button.post-btn, button.back-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: 0.2s;
+}
+
+button.post-btn {
+  background-color: #28a745;
+  color: #fff;
+}
+
+button.post-btn:hover {
+  background-color: #218838;
+}
+
+button.back-btn {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+button.back-btn:hover {
+  background-color: #5a6268;
+}
+
+.salaryTable button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 3px;
+  transition: 0.2s;
+}
+
+.salaryTable .update-btn {
+  background-color: #ffc107;
+  color: #fff;
+}
+
+.salaryTable .update-btn:hover {
+  background-color: #e0a800;
+}
+
+.salaryTable .delete-btn {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.salaryTable .delete-btn:hover {
+  background-color: #c82333;
+}
+
+.salaryTable .post-btn-row {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.salaryTable .post-btn-row:hover {
+  background-color: #218838;
+}
+
+footer {
+  background-color: #1e90ff;
+  color: #fff;
+  text-align: center;
+  padding: 10px 0;
+}

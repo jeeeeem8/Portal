@@ -1,0 +1,20 @@
+{
+  "admins": {
+    "admin1": {
+      "email": "admin@example.com",
+      "password": "admin123"
+    }
+  },
+  "teamleaders": {
+    "leader1": {
+      "email": "leader@example.com",
+      "password": "leader123"
+    }
+  },
+  "employees": {
+    "employee1": {
+      "email": "employee@example.com",
+      "password": "employee123"
+    }
+  }
+}

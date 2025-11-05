@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard - Manage User Accounts</title>
+
+  <!-- Bootstrap -->
+   <link href="https://unpkg.com/maplibre-gl@2.15.0/dist/maplibre-gl.css" rel="stylesheet" />
+<script src="https://unpkg.com/maplibre-gl@2.15.0/dist/maplibre-gl.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Firebase compat (used by existing DB code style) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <!-- Lordicon -->
+  <script src="https://cdn.lordicon.com/lordicon.js"></script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* Basic page */
+    body {
+      background: #f4f6fb;
+      font-family: "Segoe UI", sans-serif;
+      margin: 0;
+    }
+
+    /* Sidebar */
+    .sidebar {  
+      width: 250px;  
+      height: 100vh;  
+      position: fixed;  
+      top: 0; left: 0;  
+      background: linear-gradient(180deg, #2f3b8f, #1d2b64);  
+      color: #fff;  
+      padding-top: 60px;  
+      box-shadow: 2px 0 15px rgba(0,0,0,0.2);  
+    }  
+
+    .sidebar a {  
+      color: #fff;  
+      padding: 14px 20px;  
+      display: flex;  
+      align-items: center;  
+      text-decoration: none;  
+      transition: all 0.3s ease;  
+      font-size: .93rem; 
+    }  
+    .sidebar img { height: 100px; display:block; margin:0 auto 14px; }
+
+    .sidebar a:hover { background: rgba(255,255,255,0.08); transform: translateX(6px); border-radius:8px; }
+    .sidebar lord-icon { width:22px; height:22px; filter: brightness(0) invert(1); }
+
+    /* Navbar */
+    .navbar {
+      margin-left:250px;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      z-index: 1100;
+    }
+
+    /* Main content */
+    .main {
+      margin-left:250px;
+      padding:28px;
+      min-height: calc(100vh - 80px);
+    }
+
+    /* Header row: title left, live time right */
+    .page-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      margin-bottom:20px;
+    }
+    .page-header h1 { font-size:1.6rem; color:#1a237e; margin:0; }
+    #liveDateTime { color:#2a3aa0; font-weight:600; font-size:.95rem; }
+
+    /* Controls */
+    #searchSortBar {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      max-width:1100px;
+      margin: 16px auto;
+    }
+    #searchInput, #roleSort { padding:8px 10px; border-radius:6px; border:1px solid #ddd; }
+    #openAddModal { white-space:nowrap; }
+
+    /* Table */
+    .table-wrap {
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      overflow-x: auto;
+    }
+    table { min-width: 900px; background:#fff; border-radius:8px; overflow:hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+    th, td { padding:12px 14px; vertical-align:middle; }
+    thead th { background:#3a4bbf; color:#fff; font-weight:600; text-align:left; }
+    tbody tr:nth-child(even) { background: #fbfdff; }
+    tbody tr:hover { background: rgba(58,75,191,0.04); }
+    .action-btn { padding:6px 10px; border-radius:6px; border:none; cursor:pointer; }
+    .action-edit { background:#ffc107; color:#111; }
+    .action-delete { background:#dc3545; color:#fff; }
+
+    @media (max-width:900px) {
+      .sidebar { width:72px; padding-top:16px; }
+      .navbar, .main { margin-left:72px; }
+      .sidebar img { display:none; }
+      .sidebar a span { display:none; }
+      #searchSortBar, .table-wrap { max-width: 100%; padding: 0 12px; flex-wrap:wrap; }
+      .page-header { flex-direction:column; align-items:flex-start; gap:8px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+    <div class="sidebar">
+    <img src="jahslogo.png" style="height: 100px; margin-left: 20px" alt="logo">
+    <a href="admin_dashboard.html">
+      <lord-icon src="https://cdn.lordicon.com/osuxyevn.json" trigger="hover"></lord-icon>
+      Dashboard
+    </a>
+    <a href="deployment.html">
+      <lord-icon src="https://cdn.lordicon.com/abwrkdvl.json" trigger="hover"></lord-icon>
+      Deployment
+    </a>
+    <a href="inventory.html">
+      <lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover"></lord-icon>
+      Inventory
+    </a>
+    <a href="salary.html">
+      <lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="hover"></lord-icon>
+      Payroll
+    </a>
+    <a href="Announcement.html">
+      <lord-icon src="https://cdn.lordicon.com/hpivxauj.json" trigger="hover"></lord-icon>
+      Announcement
+    </a>
+    <a href="Manage_account_dashboard.html">
+      <lord-icon src="https://cdn.lordicon.com/dklbhvrt.json" trigger="hover"></lord-icon>
+      Manage Accounts
+    </a>
+    <a href="#">--------- History Logs --------</a>
+
+    <a href="deployment_log.html">
+  <lord-icon
+      src="https://cdn.lordicon.com/abwrkdvl.json"
+      trigger="hover"
+      style="width:28px;height:28px;margin-right:8px;">
+  </lord-icon>
+  Deployment History Log
+</a>
+
+<a href="inventory_log.html">
+  <lord-icon
+      src="https://cdn.lordicon.com/hwuyodym.json"
+      trigger="hover"
+      style="width:28px;height:28px;margin-right:8px;">
+  </lord-icon>
+  Inventory History Log
+</a>
+
+<a href="salary_logs.html">
+  <lord-icon
+      src="https://cdn.lordicon.com/qhgmphtg.json"
+      trigger="hover"
+      style="width:28px;height:28px;margin-right:8px;">
+  </lord-icon>
+  Salary History Log
+</a>
+
+<a href="Reports.html">
+  <lord-icon
+      src="https://cdn.lordicon.com/wloilxuq.json"
+      trigger="hover"
+      style="width:28px;height:28px;margin-right:8px;">
+  </lord-icon>
+  Report History Log
+</a>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand ms-3 fw-bold" href="#">JAHS Telecon Employee Web Portal</a>
+
+      <div class="ms-auto me-3 d-flex align-items-center">
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+            <lord-icon src="https://cdn.lordicon.com/ajkxzzfb.json" trigger="hover" style="width:28px;height:28px;margin-right:8px" colors="primary:#3a4bbf,secondary:#3a4bbf"></lord-icon>
+            <span id="welcome">Loading...</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" id="logoutLink">Log out</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <div class="main mt-5 pt-4">
+    <div class="page-header">
+      <h1>Manage User Accounts</h1>
+      <div id="liveDateTime"></div>
+    </div><br>
+
+    <!-- Search / Role filter / Add button -->
+    <div id="searchSortBar">
+      <input id="searchInput" type="text" class="form-control" placeholder="Search by name or email..." />
+      <select id="roleSort" class="form-select" style="max-width:220px">
+        <option value="">All Roles</option>
+        <option value="admin">Admin</option>
+        <option value="teamleader">Team Leader</option>
+        <option value="employee">Employee</option>
+      </select>
+<div class="d-flex gap-2 mb-3">
+  <button id="openAddModal" class="btn btn-primary btn-sm" style="flex: 1 1 auto; min-width: 100px;">
+    + Add User
+  </button>
+  <a href="Account_log.html" class="btn btn-secondary btn-sm" style="flex: 1 1 auto; min-width: 90px;">
+    User Info
+  </a>
+  <a href="Join_request.html" class="btn btn-info btn-sm" style="flex: 1 1 auto; min-width: 120px;">
+    Join Requests
+  </a>
+  <a href="admin_request.html" class="btn btn-warning btn-sm" style="flex: 1 1 auto; min-width: 120px;">
+    Leave Requests
+  </a>
+</div>
+
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table id="accountList" class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th style="width:160px">Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add User Modal -->
+  <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form id="addUserForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Account</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="text" id="add_name" class="form-control mb-2" placeholder="Full name" required />
+            <input type="email" id="add_email" class="form-control mb-2" placeholder="Email" required />
+            <input type="password" id="add_password" class="form-control mb-2" placeholder="Password" required />
+            <select id="add_role" class="form-select" required>
+              <option value="admin">Admin</option>
+              <option value="teamleader">Team Leader</option>
+              <option value="employee">Employee</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Add Account</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form id="editUserForm">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Account</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="edit_key">
+            <input type="text" id="edit_name" class="form-control mb-2" placeholder="Full name" required />
+            <input type="email" id="edit_email" class="form-control mb-2" placeholder="Email" required />
+            <input type="password" id="edit_password" class="form-control mb-2" placeholder="Password (leave blank to keep)" />
+            <select id="edit_role" class="form-select" required>
+              <option value="admin">Admin</option>
+              <option value="teamleader">Team Leader</option>
+              <option value="employee">Employee</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="margin-left:250px; padding:12px; text-align:center; color:#666;">
+    © 2025 JAHS Telecon
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- App script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Firebase config (same values you shared)
+      const firebaseConfig = {
+        apiKey: "AIzaSyB1Gbmp2j2cTfnUmuWTjcL2ypauUpQn8Qc",
+        authDomain: "jahsportal.firebaseapp.com",
+        databaseURL: "https://jahsportal-default-rtdb.firebaseio.com",
+        projectId: "jahsportal",
+        storageBucket: "jahsportal.firebasestorage.app",
+        messagingSenderId: "798312139932",
+        appId: "1:798312139932:web:2f6654cdd82a23406ff159"
+      };
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+      const accountsRef = db.ref("accounts");
+
+      // Elements
+      const tbody = document.querySelector("#accountList tbody");
+      const searchInput = document.getElementById("searchInput");
+      const roleSort = document.getElementById("roleSort");
+      const openAddModalBtn = document.getElementById("openAddModal");
+      const addUserForm = document.getElementById("addUserForm");
+      const editUserForm = document.getElementById("editUserForm");
+      const logoutLink = document.getElementById("logoutLink");
+      const welcomeSpan = document.getElementById("welcome");
+
+      // Modals (Bootstrap instances)
+      const addModalEl = document.getElementById("addUserModal");
+      const editModalEl = document.getElementById("editUserModal");
+      const addModal = new bootstrap.Modal(addModalEl);
+      const editModal = new bootstrap.Modal(editModalEl);
+
+      // Show logged user (from localStorage)
+      const loggedName = localStorage.getItem("userName") || "Guest";
+      const loggedRole = localStorage.getItem("role") || "visitor";
+      welcomeSpan.textContent = `Welcome, ${loggedName} (${loggedRole})`;
+
+      // live datetime at header
+      function updateLiveDateTime() {
+        document.getElementById("liveDateTime").textContent = new Date().toLocaleString();
+      }
+      updateLiveDateTime();
+      setInterval(updateLiveDateTime, 1000);
+
+      // Logout
+      logoutLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You will be logged out.",
+          icon: "warning",
+          showCancelButton: true
+        }).then(res => {
+          if (res.isConfirmed) {
+            localStorage.clear();
+            Swal.fire({ icon: "success", title: "Logged out", timer: 900, showConfirmButton: false });
+            setTimeout(() => window.location.href = "welcome_page.html", 900);
+          }
+        });
+      });
+
+      // Open Add modal
+      openAddModalBtn.addEventListener("click", () => {
+        addUserForm.reset();
+        addModal.show();
+      });
+
+      // Add user
+     addUserForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("add_name").value.trim();
+  const email = document.getElementById("add_email").value.trim().toLowerCase();
+  const password = document.getElementById("add_password").value;
+  const role = document.getElementById("add_role").value;
+
+  if (!name || !email || !password || !role) {
+    Swal.fire("Invalid", "Please fill all required fields.", "warning");
+    return;
+  }
+
+  // check duplicate email
+  accountsRef.orderByChild("email").equalTo(email).once("value").then(snapshot => {
+    if (snapshot.exists()) {
+      Swal.fire("Exists", "An account with that email already exists.", "info");
+      return;
+    }
+    
+    // Get all existing accountNumbers to find max number
+    accountsRef.once("value").then(allSnapshot => {
+      let maxNumber = 0;
+      
+      allSnapshot.forEach(child => {
+        const accNum = child.val().accountNumber;
+        if (accNum) {
+          // Extract number part e.g. from "ACC-001" get 1
+          const numPart = parseInt(accNum.split("-")[1]);
+          if (!isNaN(numPart) && numPart > maxNumber) {
+            maxNumber = numPart;
+          }
+        }
+      });
+
+      const nextNumber = maxNumber + 1;
+      // Format to "ACC-" + three digits with leading zeros
+      const accountNumber = "ACC-" + String(nextNumber).padStart(3, "0");
+
+      // push new account with generated accountNumber
+      const newRef = accountsRef.push();
+      newRef.set({
+        name,
+        email,
+        password,
+        role,
+        accountNumber,
+        createdAt: new Date().toISOString()
+      }).then(() => {
+        Swal.fire("Added", `Account successfully Created ${accountNumber}.`, "success");
+        addModal.hide();
+        addUserForm.reset();
+      }).catch(err => {
+        console.error(err);
+        Swal.fire("Error", "Failed to add account.", "error");
+      });
+
+    }).catch(err => {
+      console.error(err);
+      Swal.fire("Error", "Failed to read accounts for account number generation.", "error");
+    });
+
+  }).catch(err => {
+    console.error(err);
+    Swal.fire("Error", "Failed to check existing accounts.", "error");
+  });
+});
+
+
+      // Render accounts (realtime)
+      accountsRef.on("value", snapshot => {
+        tbody.innerHTML = "";
+        const val = snapshot.val();
+        if (!val) return;
+        Object.keys(val).forEach(key => {
+          const acc = val[key];
+          const tr = document.createElement("tr");
+
+          // Name
+          const tdName = document.createElement("td");
+          tdName.textContent = acc.name || "";
+          tr.appendChild(tdName);
+
+          // Email
+          const tdEmail = document.createElement("td");
+          tdEmail.textContent = acc.email || "";
+          tr.appendChild(tdEmail);
+
+          // Role
+          const tdRole = document.createElement("td");
+          tdRole.textContent = acc.role || "";
+          tr.appendChild(tdRole);
+
+          // Actions
+          const tdActions = document.createElement("td");
+          const editBtn = document.createElement("button");
+          editBtn.className = "action-btn action-edit me-2";
+          editBtn.textContent = "Edit";
+          editBtn.dataset.key = key;
+          editBtn.addEventListener("click", () => openEditModal(key));
+
+          const delBtn = document.createElement("button");
+          delBtn.className = "action-btn action-delete";
+          delBtn.textContent = "Delete";
+          delBtn.dataset.key = key;
+          delBtn.addEventListener("click", () => deleteAccount(key));
+
+          tdActions.appendChild(editBtn);
+          tdActions.appendChild(delBtn);
+          tr.appendChild(tdActions);
+
+          tbody.appendChild(tr);
+        });
+
+        applyFilters(); // re-apply search/filter after render
+      }, err => {
+        console.error("Accounts read error:", err);
+        Swal.fire("Error", "Could not load accounts.", "error");
+      });
+
+      // Open Edit modal
+      function openEditModal(key) {
+        accountsRef.child(key).once("value").then(snap => {
+          const data = snap.val();
+          if (!data) {
+            Swal.fire("Not found", "Account not found.", "error");
+            return;
+          }
+          document.getElementById("edit_key").value = key;
+          document.getElementById("edit_name").value = data.name || "";
+          document.getElementById("edit_email").value = data.email || "";
+          document.getElementById("edit_password").value = "";
+          document.getElementById("edit_role").value = data.role || "employee";
+          editModal.show();
+        }).catch(err => {
+          console.error(err);
+          Swal.fire("Error", "Failed to fetch account data.", "error");
+        });
+      }
+
+      // Save edit
+      editUserForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const key = document.getElementById("edit_key").value;
+        const name = document.getElementById("edit_name").value.trim();
+        const email = document.getElementById("edit_email").value.trim().toLowerCase();
+        const password = document.getElementById("edit_password").value;
+        const role = document.getElementById("edit_role").value;
+
+        if (!key || !name || !email || !role) {
+          Swal.fire("Invalid", "Please fill required fields.", "warning");
+          return;
+        }
+
+        // check for duplicate email (excluding current)
+        accountsRef.orderByChild("email").equalTo(email).once("value").then(snapshot => {
+          let conflict = false;
+          snapshot.forEach(child => {
+            if (child.key !== key) conflict = true;
+          });
+          if (conflict) {
+            Swal.fire("Exists", "Another account uses that email.", "info");
+            return;
+          }
+
+          const updated = { name, email, role };
+          if (password) updated.password = password;
+
+          accountsRef.child(key).update(updated).then(() => {
+            Swal.fire("Saved", "Account updated.", "success");
+            editModal.hide();
+          }).catch(err => {
+            console.error(err);
+            Swal.fire("Error", "Update failed.", "error");
+          });
+        }).catch(err => {
+          console.error(err);
+          Swal.fire("Error", "Failed to validate email.", "error");
+        });
+      });
+
+      // Delete account
+      function deleteAccount(key) {
+        Swal.fire({
+          title: "Delete account?",
+          text: "This will permanently remove the account.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, delete",
+          cancelButtonText: "Cancel"
+        }).then(result => {
+          if (!result.isConfirmed) return;
+          accountsRef.child(key).remove().then(() => {
+            Swal.fire("Deleted", "Account removed.", "success");
+          }).catch(err => {
+            console.error(err);
+            Swal.fire("Error", "Delete failed.", "error");
+          });
+        });
+      }
+
+      // Filters & search
+      function applyFilters() {
+        const q = (searchInput.value || "").trim().toLowerCase();
+        const role = (roleSort.value || "").toLowerCase();
+        tbody.querySelectorAll("tr").forEach(tr => {
+          const name = (tr.cells[0]?.textContent || "").toLowerCase();
+          const email = (tr.cells[1]?.textContent || "").toLowerCase();
+          const r = (tr.cells[2]?.textContent || "").toLowerCase();
+          const matches = (!q || name.includes(q) || email.includes(q)) && (!role || r === role);
+          tr.style.display = matches ? "" : "none";
+        });
+      }
+      searchInput.addEventListener("input", applyFilters);
+      roleSort.addEventListener("change", applyFilters);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>User Info — Profile</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --accent: #2563eb;
+    }
+    body {
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      margin: 0;
+      background-image: url(infobg.png);
+      background-size: cover;
+      color: #111;
+    }
+    .wrap {
+      max-width: 520px;
+      margin: 36px auto;
+      padding: 24px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 28px 28px 36px;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+    }
+    h1 {
+      margin: 0 0 24px;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    form.grid {
+      display: grid;
+      gap: 20px;
+    }
+    label {
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: #111;
+      font-weight: 600;
+      display: block;
+    }
+    input {
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #e6e9ef;
+      font-size: 14px;
+      width: 100%;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 4px var(--accent);
+    }
+    input[readonly] {
+      background: #f9fafb;
+      color: #555;
+      cursor: not-allowed;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+      user-select: none;
+    }
+    button:hover,
+    button:focus {
+      background: #1e40af;
+      outline: none;
+    }
+    button.secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid rgba(37, 99, 235, 0.15);
+      padding: 8px 14px;
+    }
+    button.secondary:hover {
+      background: rgba(37, 99, 235, 0.1);
+    }
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .actions {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>User Info</h1>
+      <form id="userForm" class="grid" onsubmit="return false;">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" readonly />
+        </div>
+
+        <div class="field">
+          <label for="name">Full name</label>
+          <input id="name" type="text" required />
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="row">
+            <input id="password" type="password" required />
+            <button id="togglePwd" class="secondary" type="button" aria-pressed="false">Show</button>
+          </div>
+          <div class="hint">Password is shown only for convenience — avoid using production passwords in plain text.</div>
+        </div>
+
+        <div class="field">
+          <label for="address">Address</label>
+          <input id="address" type="text" />
+        </div>
+
+        <div class="field">
+          <label for="contact">Contact number</label>
+          <input id="contact" type="tel" />
+        </div>
+
+        <div class="field">
+          <label for="role">Role (read-only)</label>
+          <input id="role" type="text" readonly />
+        </div>
+
+        <div class="actions">
+          <button type="button" id="leaveRequestBtn" class="secondary" aria-label="eave Requests"><a href="employee_request.html">Leave Requests</a></button>
+          <button type="submit" aria-label="Save changes">Save Changes</button>
+          <button type="button" id="backBtn" class="secondary" aria-label="Go back to previous page">Back</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Firebase Init
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1Gbmp2j2cTfnUmuWTjcL2ypauUpQn8Qc",
+      authDomain: "jahsportal.firebaseapp.com",
+      databaseURL: "https://jahsportal-default-rtdb.firebaseio.com",
+      projectId: "jahsportal",
+      storageBucket: "jahsportal.firebasestorage.app",
+      messagingSenderId: "798312139932",
+      appId: "1:798312139932:web:2f6654cdd82a23406ff159"
+    };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    // DOM Elements
+    const email = document.getElementById('email');
+    const nameInput = document.getElementById('name');
+    const password = document.getElementById('password');
+    const address = document.getElementById('address');
+    const contact = document.getElementById('contact');
+    const role = document.getElementById('role');
+    const form = document.getElementById('userForm');
+    const togglePwdBtn = document.getElementById('togglePwd');
+    const backBtn = document.getElementById('backBtn');
+
+    // Load current user from localStorage
+    const loggedEmail = localStorage.getItem("email");
+    const loggedRole = localStorage.getItem("role");
+
+    // Show SweetAlert message and redirect
+    function showWarningAndRedirect(title, text, redirectUrl) {
+      Swal.fire({
+        icon: 'warning',
+        title: title,
+        text: text,
+        confirmButtonColor: '#2563eb'
+      }).then(() => {
+        window.location.href = redirectUrl;
+      });
+    }
+
+    // Access restrictions
+    if (!loggedEmail) {
+      showWarningAndRedirect("You must log in first.", "", "index.html");
+    } else if (!["admin", "teamleader", "employee"].includes(loggedRole)) {
+      showWarningAndRedirect("Access denied.", "", "index.html");
+    }
+
+    // Fetch account from Firebase by email
+    db.ref("accounts").orderByChild("email").equalTo(loggedEmail).once("value")
+      .then(snap => {
+        if (!snap.exists()) {
+          Swal.fire({
+            icon: 'error',
+            title: 'User account not found.',
+            confirmButtonColor: '#2563eb'
+          });
+          return;
+        }
+        snap.forEach(child => {
+          const acc = child.val();
+          email.value = acc.email || "";
+          nameInput.value = acc.name || "";
+          password.value = acc.password || "";
+          address.value = acc.address || "";
+          contact.value = acc.contact || "";
+          role.value = acc.role || "";
+          form.dataset.key = child.key;
+        });
+      })
+      .catch(err => {
+        console.error("Error loading user data:", err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error loading user data.',
+          text: err.message,
+          confirmButtonColor: '#2563eb'
+        });
+      });
+
+    // Toggle password visibility
+    togglePwdBtn.addEventListener('click', () => {
+      if (password.type === 'password') {
+        password.type = 'text';
+        togglePwdBtn.textContent = 'Hide';
+        togglePwdBtn.setAttribute('aria-pressed', 'true');
+      } else {
+        password.type = 'password';
+        togglePwdBtn.textContent = 'Show';
+        togglePwdBtn.setAttribute('aria-pressed', 'false');
+      }
+    });
+
+    // Save changes handler
+    form.addEventListener("submit", () => {
+      const key = form.dataset.key;
+      if (!key) {
+        Swal.fire({
+          icon: 'error',
+          title: 'User key not found',
+          text: 'Cannot update profile without a valid user key.',
+          confirmButtonColor: '#2563eb'
+        });
+        return;
+      }
+      db.ref("accounts/" + key).update({
+        name: nameInput.value,
+        password: password.value,
+        address: address.value,
+        contact: contact.value
+      }).then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: "Profile updated successfully!",
+          confirmButtonColor: '#2563eb'
+        });
+      }).catch(err => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error updating profile',
+          text: err.message,
+          confirmButtonColor: '#2563eb'
+        });
+      });
+    });
+
+    // Back button handler with enhanced logic
+    backBtn.addEventListener('click', () => {
+      // Check if history length > 1 means we likely can go back
+      if (window.history.length > 1) {
+        window.history.back();
+        // Set a timeout to fallback to index.html if strangely no nav occurs
+        setTimeout(() => {
+          if (document.location.href.indexOf('profile') !== -1 ) {
+            window.location.href = 'index.html';
+          }
+        }, 500);
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+</html>

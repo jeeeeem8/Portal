@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
+  <title>JAHS Admin Dashboard - Salary Logs</title>
+
+  <!-- Bootstrap 5 -->  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />  
+
+  <!-- SweetAlert2 -->  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Lordicon -->  
+  <script src="https://cdn.lordicon.com/lordicon.js"></script>  
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    body {  
+      font-family: "Segoe UI", sans-serif;  
+      background: linear-gradient(135deg, #e4e7f6, #f4f6fc);  
+      overflow-x: hidden;  
+      margin: 0;  
+      padding: 0;  
+    }  
+
+    /* Sidebar */    
+    .sidebar {  
+      width: 250px;  
+      height: 100vh;  
+      position: fixed;  
+      top: 0; left: 0;  
+      background: linear-gradient(180deg, #2f3b8f, #1d2b64);  
+      color: #fff;  
+      padding-top: 60px;  
+      box-shadow: 2px 0 15px rgba(0,0,0,0.2);  
+    }  
+
+    .sidebar a {  
+      color: #fff;  
+      padding: 14px 20px;  
+      display: flex;  
+      align-items: center;  
+      text-decoration: none;  
+      transition: all 0.3s ease;  
+      font-size: .93rem;  
+    }  
+
+    .sidebar a:hover {  
+      background: rgba(255,255,255,0.2);  
+      transform: translateX(10px) scale(1.05);  
+      border-radius: 8px;  
+    }  
+
+    .sidebar lord-icon {  
+      width: 28px;  
+      height: 28px;  
+      margin-right: 12px;  
+      filter: brightness(0) invert(1);  
+      transition: transform 0.4s ease;  
+    }  
+
+    .sidebar a:hover lord-icon {  
+      transform: rotate(15deg) scale(1.3);  
+    }  
+
+    /* Navbar */  
+    .navbar {  
+      margin-left: 250px;  
+      transition: all 0.3s ease;  
+    }  
+
+    /* Content area */
+    .content {  
+      margin-left: 250px;  
+      padding: 20px;  
+      height: calc(100vh - 56px);  
+      overflow-y: auto;  
+    }
+
+    /* Salary Table */
+    .filter-container {
+      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .filter-container input,
+    .filter-container select {
+      padding: 7px 10px;
+      border-radius: 5px;
+      border: 1px solid #ccd6f2;
+      min-width: 150px;
+    }
+    .filter-container button {
+      background-color: #364fc7;
+      border: none;
+      color: white;
+      padding: 7px 18px;
+      border-radius: 5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th {
+      background-color: #364fc7;
+      color: white;
+      padding: 10px;
+      cursor: pointer;
+      user-select: none;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    td {
+      padding: 10px;
+      border: 1px solid #dee2e6;
+      text-align: center;
+      vertical-align: middle;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #f7f9ff;
+    }
+    .selectAllCheckbox {
+      margin: 0;
+      cursor: pointer;
+    }
+    /* Payslip card style for print */
+    #printArea { display:none; }
+    .payslip-card {
+      border: 2px solid #364fc7;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      width: 680px;
+      font-family: "Segoe UI", sans-serif;
+      background: white;
+    }
+    .payslip-header {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: #364fc7;
+      font-size: 1.5rem;
+      border-bottom: 2px solid #364fc7;
+      padding-bottom: 6px;
+    }
+    .payslip-row {
+      display:flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px dashed #ccc;
+    }
+    .payslip-label { font-weight: 600; color: #2a3aa0; }
+    .payslip-value { font-weight: 400; }
+    @media print {
+      body * { visibility: hidden; }
+      #printArea, #printArea * { visibility: visible; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 10px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+   <div class="sidebar">
+    <img src="jahslogo.png" style="height: 100px; margin-left: 20px" alt="logo">
+    <a href="admin_dashboard.html"><lord-icon src="https://cdn.lordicon.com/osuxyevn.json" trigger="hover"></lord-icon>Dashboard</a>
+    <a href="deployment.html"><lord-icon src="https://cdn.lordicon.com/abwrkdvl.json" trigger="hover"></lord-icon>Deployment</a>
+    <a href="inventory.html"><lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover"></lord-icon>Inventory</a>
+    <a href="salary.html"><lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="hover"></lord-icon>Payroll</a>
+    <a href="Announcement.html"><lord-icon src="https://cdn.lordicon.com/hpivxauj.json" trigger="hover"></lord-icon>Announcement</a>
+    <a href="Manage_account_dashboard.html"><lord-icon src="https://cdn.lordicon.com/dklbhvrt.json" trigger="hover"></lord-icon>Manage Accounts</a>
+    <a href="#">--------- History Logs --------</a>
+    <a href="deployment_log.html"><lord-icon src="https://cdn.lordicon.com/abwrkdvl.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>Deployment History Log</a>
+    <a href="inventory_log.html"><lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>Inventory History Log</a>
+    <a href="salary_logs.html"><lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>Salary History Log</a>
+    <a href="Reports.html"><lord-icon src="https://cdn.lordicon.com/wloilxuq.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>Report History Log</a>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand ms-3 fw-bold" href="#">JAHS Telecon Employee Web Portal</a>
+      <div class="dropdown ms-auto me-3">
+        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+          <lord-icon src="https://cdn.lordicon.com/ajkxzzfb.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>
+          <span id="welcome">Loading...</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="#" onclick="logout()">Log out</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="content"><br><br><br>
+    <h2>Posted Salary Records</h2>
+
+    <div class="filter-container">
+      <input type="text" id="searchInput" placeholder="Search by name or role..." />
+      <select id="roleFilter">
+        <option value="">All Roles</option>
+        <option value="Team Leader">Team Leader</option>
+        <option value="Employee">Employee</option>
+      </select>
+      <label>Posted From: <input type="date" id="dateFrom" /></label>
+      <label>Posted To: <input type="date" id="dateTo" /></label>
+      <button onclick="applyFilters()">Apply Filters</button>
+      <button onclick="clearFilters()">Clear Filters</button>
+      <button onclick="printSelected()" style="margin-left:auto;">Print Selected Payslips</button>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table id="salaryTable">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="selectAll" class="selectAllCheckbox" /></th>
+            <th data-column="name">Name ▲▼</th>
+            <th data-column="role">Role ▲▼</th>
+            <th data-column="dailyRate">Daily Rate ▲▼</th>
+            <th data-column="totalDays">Total Days ▲▼</th>
+            <th data-column="totalSalary">Total Salary ▲▼</th>
+            <th data-column="startDate">Start Date ▲▼</th>
+            <th data-column="endDate">End Date ▲▼</th>
+            <th data-column="postedDate">Posted Date ▲▼</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="9" style="text-align:center;">Loading records...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="printArea"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // SweetAlert logout
+    function logout() {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You will be logged out.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#2f3b8f',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, log out'
+      }).then((result) => {
+        if(result.isConfirmed){
+          localStorage.clear();
+          Swal.fire({title:'Logged out!', icon:'success', timer:1500, showConfirmButton:false});
+          setTimeout(()=>{ window.location.href = "welcome_page.html"; }, 1500);
+        }
+      });
+    }
+
+    const userName = localStorage.getItem("userName") || "Guest";
+    const role = localStorage.getItem("role") || "visitor";
+    document.getElementById("welcome").innerHTML = `Welcome, ${userName} (${role})`;
+
+    // Firebase init
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1Gbmp2j2cTfnUmuWTjcL2ypauUpQn8Qc",
+      authDomain: "jahsportal.firebaseapp.com",
+      databaseURL: "https://jahsportal-default-rtdb.firebaseio.com",
+      projectId: "jahsportal",
+      storageBucket: "jahsportal.firebasestorage.app",
+      messagingSenderId: "798312139932",
+      appId: "1:798312139932:web:2f6654cdd82a23406ff159"
+    };
+    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let allRecords = [], filteredRecords = [], sortColumn = null, sortDesc = false;
+    const tableBody = document.querySelector("#salaryTable tbody");
+    const selectAllCheckbox = document.getElementById("selectAll");
+
+    function fetchData(){
+      db.ref("posted_salary_record").once("value").then(snapshot=>{
+        const data = snapshot.val();
+        if(!data){ tableBody.innerHTML='<tr><td colspan="9" style="text-align:center;">No records found.</td></tr>'; return; }
+        allRecords = Object.entries(data).map(([key,val])=>({__key:key,...val}));
+        filteredRecords = [...allRecords];
+        renderTable(filteredRecords);
+      }).catch(e=>{
+        Swal.fire('Error','Failed to load data','error');
+        console.error(e);
+      });
+    }
+
+    function renderTable(records){
+      if(records.length===0){ tableBody.innerHTML='<tr><td colspan="9" style="text-align:center;">No matching records found.</td></tr>'; return; }
+      tableBody.innerHTML = records.map(rec => `
+        <tr>
+          <td><input type="checkbox" class="rowCheckbox" data-key="${rec.__key}"/></td>
+          <td>${rec.name}</td>
+          <td>${rec.role}</td>
+          <td>₱${rec.dailyRate.toLocaleString()}</td>
+          <td>${rec.totalDays}</td>
+          <td>₱${rec.totalSalary.toLocaleString()}</td>
+          <td>${rec.startDate}</td>
+          <td>${rec.endDate}</td>
+          <td>${rec.postedDate}</td>
+        </tr>`).join('');
+      selectAllCheckbox.checked=false;
+      attachRowCheckboxListeners();
+    }
+
+    function attachRowCheckboxListeners(){
+      document.querySelectorAll(".rowCheckbox").forEach(cb=>{
+        cb.addEventListener('change',()=>{
+          if(!cb.checked) selectAllCheckbox.checked=false;
+          else if(Array.from(document.querySelectorAll(".rowCheckbox")).every(c=>c.checked)) selectAllCheckbox.checked=true;
+        });
+      });
+    }
+
+    selectAllCheckbox.addEventListener('change',()=>{
+      document.querySelectorAll(".rowCheckbox").forEach(cb=>cb.checked=selectAllCheckbox.checked);
+    });
+
+    function applyFilters(){
+      const search=document.getElementById("searchInput").value.toLowerCase();
+      const roleFilter=document.getElementById("roleFilter").value;
+      const dateFrom=document.getElementById("dateFrom").value;
+      const dateTo=document.getElementById("dateTo").value;
+
+      filteredRecords = allRecords.filter(rec=>{
+        if(roleFilter && rec.role!==roleFilter) return false;
+        if(search && !((rec.name&&rec.name.toLowerCase().includes(search))||(rec.role&&rec.role.toLowerCase().includes(search)))) return false;
+        if(dateFrom && rec.postedAt<dateFrom) return false;
+        if(dateTo && rec.postedAt>dateTo+"T23:59:59.999Z") return false;
+        return true;
+      });
+      if(sortColumn){ sortData(sortColumn,sortDesc); } else { renderTable(filteredRecords); }
+    }
+
+    function clearFilters(){
+      document.getElementById("searchInput").value="";
+      document.getElementById("roleFilter").value="";
+      document.getElementById("dateFrom").value="";
+      document.getElementById("dateTo").value="";
+      filteredRecords=[...allRecords];
+      sortColumn=null; sortDesc=false;
+      renderTable(filteredRecords);
+    }
+
+    function sortData(column, desc){
+      sortColumn=column; sortDesc=desc;
+      filteredRecords.sort((a,b)=>{
+        let valA=a[column], valB=b[column];
+        if(typeof valA==='string' && !isNaN(Date.parse(valA))){ valA=new Date(valA).getTime(); valB=new Date(valB).getTime(); }
+        else if(typeof valA==='string'){ valA=valA.toLowerCase(); valB=valB.toLowerCase(); }
+        if(valA>valB) return desc?-1:1;
+        if(valA<valB) return desc?1:-1;
+        return 0;
+      });
+      renderTable(filteredRecords);
+    }
+
+    document.querySelectorAll("#salaryTable th[data-column]").forEach(th=>{
+      th.addEventListener("click",()=>{
+        const col=th.getAttribute("data-column");
+        sortColumn===col?sortDesc=!sortDesc:sortDesc=false;
+        sortColumn=col;
+        sortData(sortColumn,sortDesc);
+      });
+    });
+
+    function printSelected(){
+      const checkedBoxes=Array.from(document.querySelectorAll(".rowCheckbox:checked"));
+      if(checkedBoxes.length===0){ 
+        Swal.fire("No selection","Please select at least one record to print.","warning"); 
+        return; 
+      }
+      const keys=checkedBoxes.map(cb=>cb.getAttribute("data-key"));
+      const recordsToPrint=filteredRecords.filter(rec=>keys.includes(rec.__key));
+
+      let html = recordsToPrint.map(rec=>`
+        <div class="payslip-card">
+          <div class="payslip-header">JAHS Telecon Salary Payslip</div>
+          <div class="payslip-row"><div class="payslip-label">Name:</div><div class="payslip-value">${rec.name}</div></div>
+          <div class="payslip-row"><div class="payslip-label">Role:</div><div class="payslip-value">${rec.role}</div></div>
+          <div class="payslip-row"><div class="payslip-label">Daily Rate:</div><div class="payslip-value">₱${rec.dailyRate.toLocaleString()}</div></div>
+          <div class="payslip-row"><div class="payslip-label">Total Days:</div><div class="payslip-value">${rec.totalDays}</div></div>
+          <div class="payslip-row"><div class="payslip-label">Total Salary:</div><div class="payslip-value">₱${rec.totalSalary.toLocaleString()}</div></div>
+          <div class="payslip-row"><div class="payslip-label">Period:</div><div class="payslip-value">${rec.startDate} to ${rec.endDate}</div></div>
+          <div class="payslip-row"><div class="payslip-label">Posted Date:</div><div class="payslip-value">${rec.postedDate}</div></div>
+        </div>`).join('');
+      const printArea = document.getElementById("printArea");
+      printArea.innerHTML=html; printArea.style.display="block"; window.print(); printArea.style.display="none";
+    }
+
+    // Initialize
+    fetchData();
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
+    document.getElementById("roleFilter").addEventListener("change", applyFilters);
+    document.getElementById("dateFrom").addEventListener("change", applyFilters);
+    document.getElementById("dateTo").addEventListener("change", applyFilters);
+
+  </script>
+
+</body>
+</html>

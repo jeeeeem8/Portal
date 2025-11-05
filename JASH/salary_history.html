@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salary History</title>
+  <link rel="stylesheet" href="salary_history.css">
+</head>
+<body>
+  <h2>Salary History</h2>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search by name..." />
+    <button id="deleteSelectedBtn">Delete Selected</button>
+  </div>
+
+  <table id="salaryTable">
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="selectAll"></th>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Daily Rate</th>
+        <th>Total Days</th>
+        <th>Total Salary</th>
+        <th>Month</th>
+      </tr>
+    </thead>
+    <tbody id="salaryBody">
+      <!-- Records will be inserted here -->
+    </tbody>
+  </table>
+
+<a href="salary.html"><button>Back</button></a>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="salary_history.js"></script>
+</body>
+</html>

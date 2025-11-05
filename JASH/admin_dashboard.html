@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <title>JAHS Admin Dashboard</title>  a
+
+  <!-- Bootstrap 5 -->  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">  
+
+  <!-- Lordicon -->  
+  <script src="https://cdn.lordicon.com/lordicon.js"></script>  
+
+  <!-- Chart.js -->  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  
+
+  <!-- SweetAlert2 -->  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>  
+
+  <style>    
+    body {  
+      font-family: "Segoe UI", sans-serif;  
+      background: linear-gradient(135deg, #e4e7f6, #f4f6fc);  
+      overflow-x: hidden;  
+    }  
+
+    /* Sidebar */    
+    .sidebar {  
+      width: 250px;  
+      height: 100vh;  
+      position: fixed;  
+      top: 0; left: 0;  
+      background: linear-gradient(180deg, #2f3b8f, #1d2b64);  
+      color: #fff;  
+      padding-top: 60px;  
+      box-shadow: 2px 0 15px rgba(0,0,0,0.2);  
+    }  
+
+    .sidebar a {  
+      color: #fff;  
+      padding: 14px 20px;  
+      display: flex;  
+      align-items: center;  
+      text-decoration: none;  
+      transition: all 0.3s ease;  
+      font-size: .93rem; 
+    }  
+
+    .sidebar a:hover {  
+      background: rgba(255,255,255,0.2);  
+      transform: translateX(10px) scale(1.05);  
+      border-radius: 8px;  
+    }  
+
+    .sidebar lord-icon {  
+      width: 28px;  
+      height: 28px;  
+      margin-right: 12px;  
+      filter: brightness(0) invert(1);  
+      transition: transform 0.4s ease;  
+    }  
+
+    .sidebar a:hover lord-icon {  
+      transform: rotate(15deg) scale(1.3);  
+    }  
+
+    /* Content */    
+    .content {  
+      margin-left: 250px;  
+      padding: 20px;  
+      animation: fadeInUp 0.6s ease-in-out;  
+    }  
+
+    @keyframes fadeInUp {  
+      from {opacity: 0; transform: translateY(20px);}  
+      to {opacity: 1; transform: translateY(0);}  
+    }  
+
+    .navbar {  
+      margin-left: 250px;  
+      transition: all 0.3s ease;  
+    }  
+
+    /* Cards */    
+    .card {  
+      border-radius: 15px;  
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);  
+      transition: transform 0.4s ease, box-shadow 0.4s ease;  
+      animation: zoomIn 0.6s ease;  
+    }  
+
+    .card:hover {  
+      transform: translateY(-8px) scale(1.02);  
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);  
+    }  
+
+    @keyframes zoomIn {  
+      from {opacity: 0; transform: scale(0.9);}  
+      to {opacity: 1; transform: scale(1);}  
+    }  
+
+    #liveDateTime {  
+      font-size: 1.3rem;  
+      font-weight: bold;  
+      color: #2f3b8f;  
+    }  
+
+    .calendar-grid {  
+      display: grid;  
+      grid-template-columns: repeat(7, 1fr);  
+      gap: 6px;  
+      margin-top: 10px;  
+    }  
+
+    .calendar-grid div {  
+      font-size: 1.2rem;  
+      padding: 15px 0;  
+      border-radius: 8px;  
+      text-align: center;  
+      transition: all 0.3s ease;  
+    }  
+
+    .calendar-grid div:hover {  
+      background: rgba(47, 59, 143, 0.1);  
+      transform: scale(1.1);  
+    }  
+
+    .calendar-day.other-month {  
+      color: #aaa;  
+    }  
+
+    .calendar-day.today {  
+      background: #2f3b8f;  
+      color: white;  
+      font-weight: bold;  
+      transform: scale(1.1);  
+    }  
+
+    /* Dashboard Header */    
+    .dashboard-header {  
+      background: linear-gradient(135deg, #2f3b8f, #1d2b64);  
+      padding: 25px 30px;  
+      border-radius: 15px;  
+      color: white;  
+      margin-bottom: 25px;  
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);  
+    }  
+
+    .dashboard-header h3 {  
+      color: #fff;  
+      margin: 0;  
+      font-weight: bold;  
+    }  
+
+    .dashboard-header p {  
+      margin: 5px 0 0;  
+      color: #f4f6fc;  
+      font-size: 1rem;  
+    }  
+#deploymentList {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+#deploymentList::-webkit-scrollbar {
+  width: 6px;
+}
+
+#deploymentList::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+
+#deploymentList::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+  </style>
+</head>
+<body>  
+
+  <!-- Sidebar -->  
+    <div class="sidebar">
+    <img src="jahslogo.png" style="height: 100px; margin-left: 20px" alt="logo">
+    <a href="admin_dashboard.html">
+      <lord-icon src="https://cdn.lordicon.com/osuxyevn.json" trigger="hover"></lord-icon>
+      Dashboard
+    </a>
+    <a href="deployment.html">
+      <lord-icon src="https://cdn.lordicon.com/abwrkdvl.json" trigger="hover"></lord-icon>
+      Deployment
+    </a>
+    <a href="inventory.html">
+      <lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover"></lord-icon>
+      Inventory
+    </a>
+    <a href="salary.html">
+      <lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="hover"></lord-icon>
+      Payroll
+    </a>
+    <a href="Announcement.html">
+      <lord-icon src="https://cdn.lordicon.com/hpivxauj.json" trigger="hover"></lord-icon>
+      Announcement
+    </a>
+    <a href="Manage_account_dashboard.html">
+      <lord-icon src="https://cdn.lordicon.com/dklbhvrt.json" trigger="hover"></lord-icon>
+      Manage Accounts
+    </a>
+    <a href="#">--------- History Logs --------</a>
+
+    <a href="deployment_log.html">
+  <lord-icon
+      src="https://cdn.lordicon.com/abwrkdvl.json"
+      trigger="hover"
+      style="width:28px;height:28px;margin-right:8px;">
+  </lord-icon>
+  Deployment History Log
+</a>
+
+<a href="inventory_log.html">
+  <lord-icon
+      src="https://cdn.lordicon.com/hwuyodym.json"
+      trigger="hover"
+      style="width:28px;height:28px;margin-right:8px;">
+  </lord-icon>
+  Inventory History Log
+</a>
+
+<a href="salary_logs.html">
+  <lord-icon
+      src="https://cdn.lordicon.com/qhgmphtg.json"
+      trigger="hover"
+      style="width:28px;height:28px;margin-right:8px;">
+  </lord-icon>
+  Salary History Log
+</a>
+
+<a href="Reports.html">
+  <lord-icon
+      src="https://cdn.lordicon.com/wloilxuq.json"
+      trigger="hover"
+      style="width:28px;height:28px;margin-right:8px;">
+  </lord-icon>
+  Report History Log
+</a>
+  </div> 
+
+  <!-- Navbar -->  
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">  
+    <div class="container-fluid">  
+      <a class="navbar-brand ms-3 fw-bold" href="#">JAHS Telecon Employee Web Portal</a>  
+      <div class="dropdown ms-auto me-3 position-relative" id="customUserDropdown">
+  <button
+    class="btn btn-link text-decoration-none d-flex align-items-center dropdown-toggle p-0"
+    id="userDropdown"
+    type="button"
+    aria-expanded="false"
+  >
+    <lord-icon src="https://cdn.lordicon.com/ajkxzzfb.json"
+               trigger="hover"
+               style="width:28px;height:28px;margin-right:8px;"></lord-icon>
+    <span id="welcome">Loading...</span>
+  </button>
+
+  <ul class="dropdown-menu animate__animated animate__fadeInDown"
+      id="userDropdownMenu"
+      aria-labelledby="userDropdown"
+      style="
+        position: absolute;
+        top: 100%;
+        right: 0;     /* 👈 Forces alignment to the right edge */
+        left: auto;   /* 👈 Prevents left alignment */
+        transform: translateY(4px);
+        will-change: transform;
+      ">
+
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item text-danger" href="#" onclick="logout()">Log out</a></li>
+  </ul>
+</div>
+
+<script>
+  (function () {
+    const btn = document.getElementById('userDropdown');
+    const menu = document.getElementById('userDropdownMenu');
+    if (!btn || !menu) return;
+
+    menu.classList.remove('show');
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      const isShown = menu.classList.toggle('show');
+      btn.setAttribute('aria-expanded', isShown ? 'true' : 'false');
+    });
+
+    menu.addEventListener('click', e => e.stopPropagation());
+
+    document.addEventListener('click', () => {
+      if (menu.classList.contains('show')) {
+        menu.classList.remove('show');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && menu.classList.contains('show')) {
+        menu.classList.remove('show');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  })();
+</script>
+  
+    </div>  
+  </nav>  
+
+  <!-- Main Content -->  
+  <div class="content mt-5 pt-3">  
+    <!-- Dashboard Title + Description -->  
+    <div class="dashboard-header">  
+      <h3>Dashboard</h3>  
+      <p>Welcome to the admin panel. Monitor deployments, manage inventory, payroll, attendance, and more all in one place.</p>  
+    </div>  <br>
+
+    <div class="row g-4">  
+      <!-- Top Row -->  
+
+
+<div class="row" style="display: flex; gap: 20px;">
+
+  <!-- Deployment -->
+  <div class="col card p-3" 
+       style="flex: 1; height: 540px; display: flex; flex-direction: column; 
+              border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+              backdrop-filter: blur(10px); background: rgba(255,255,255,0.8);">
+    <h5 class="mb-2" style="font-weight: 600; color: #2d41af;">
+      <i class="ti ti-briefcase me-2"></i> Deployment
+    </h5>
+    <ul id="deploymentList" class="list-group mt-2 flex-grow-1 overflow-auto" 
+        style="max-height: 440px; border-radius: 10px; background: rgba(255,255,255,0.6);">
+      <li class="list-group-item">Loading deployments...</li>
+    </ul>
+  </div>
+
+  <!-- Inventory Chart -->
+  <div class="col card p-3" 
+     style="flex: 1; height: 540px; display: flex; flex-direction: column; 
+            border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            backdrop-filter: blur(10px); background: rgba(255,255,255,0.8); 
+            justify-content: flex-start; align-items: stretch;">
+
+  <!-- Title Section (Left-aligned) -->
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+    <lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover" 
+               style="width:22px;height:22px;"></lord-icon>
+    <h5 style="font-weight: 600; color: #2d41af; margin: 0;">Inventory</h5>
+  </div>
+
+  <!-- Chart -->
+  <div style="flex-grow: 1; display: flex; justify-content: center; align-items: center;">
+    <canvas id="inventoryChart" 
+            style="width: 180px; max-height: 380px; width: 100%; height: auto;"></canvas>
+  </div>
+</div>
+
+
+  <!-- Calendar -->
+<div class="col card p-3" 
+     style="flex: 1; height: 100%; max-height: 540px; display: flex; flex-direction: column; 
+            justify-content: flex-start; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            backdrop-filter: blur(10px); background: rgba(255,255,255,0.8);">
+
+  <h5 style="font-weight: 600; color: #2d41af; margin-bottom: 6px;">
+    <lord-icon src="https://cdn.lordicon.com/puvaffet.json" trigger="hover" 
+               style="width:24px;height:24px; vertical-align: middle; margin-right: 6px;"></lord-icon>
+    Calendar
+  </h5>
+
+  <div id="liveDateTime" 
+       style="font-weight: 500; color: #333; text-align: center; margin-bottom: 10px;">
+  </div>
+
+  <div id="calendarGrid" class="calendar-grid" 
+       style="flex-grow: 1; min-height: 0; display: grid; 
+              grid-template-columns: repeat(7, 1fr); gap: 6px; 
+              padding: 8px 10px; border-radius: 10px; 
+              background: rgba(255,255,255,0.6); align-content: start;">
+  </div>
+</div>
+
+
+
+</div>
+
+           
+   <!-- Announcements -->
+    <!-- Announcements -->
+      <div class="col-lg-6" style="height: 200px; width: 1628px;">
+        <div class="card announcement-card p-3 h-100">
+          <h5 class="d-flex align-items-center">
+            <lord-icon src="https://cdn.lordicon.com/megfpdmb.json" trigger="loop" delay="2000" colors="primary:#2f3b8f" class="card-title-icon"></lord-icon>
+            Announcements
+          </h5>
+          <ul id="announcementListContainer" class="list-group mt-2">
+            <li class="list-group-item">Loading announcements...</li>
+          </ul>
+        </div>
+      </div> 
+    </div>  
+  </div>  
+
+  <!-- Scripts -->  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>  
+  <script>  
+    // Logout with SweetAlert    
+    function logout() {  
+      Swal.fire({  
+        title: "Are you sure?",  
+        text: "You will be logged out of the system.",  
+        icon: "warning",  
+        showCancelButton: true,  
+        confirmButtonColor: "#2f3b8f",  
+        cancelButtonColor: "#d33",  
+        confirmButtonText: "Yes, log out"  
+      }).then((result) => {  
+        if (result.isConfirmed) {  
+          localStorage.clear();  
+          Swal.fire({  
+            title: "Logged out!",  
+            text: "Redirecting to welcome page...",  
+            icon: "success",  
+            timer: 1500,  
+            showConfirmButton: false  
+          });  
+          setTimeout(() => {  
+            window.location.href = "welcome_page.html";  
+          }, 1500);  
+        }  
+      });  
+    }  
+
+    // Live Date & Time    
+   
+
+  function updateLiveDateTime() {  
+    const now = new Date();  
+    const day = now.toLocaleDateString("en-US", { weekday: "long" });  
+    const date = now.toLocaleDateString("en-US");  
+    const time = now.toLocaleTimeString("en-US");  
+    document.getElementById("liveDateTime").textContent = `${day}, ${date} ${time}`;  
+  }  
+  setInterval(updateLiveDateTime, 1000);  
+  updateLiveDateTime();  
+
+  // Calendar Renderer    
+  function renderCalendar() {  
+    const now = new Date();  
+    const year = now.getFullYear();  
+    const month = now.getMonth();  
+    const today = now.getDate();  
+    const firstDay = new Date(year, month, 1).getDay();  
+    const daysInMonth = new Date(year, month + 1, 0).getDate();  
+    const daysInPrev = new Date(year, month, 0).getDate();  
+    const calendarEl = document.getElementById("calendarGrid");  
+    calendarEl.innerHTML = "";  
+
+    const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];  
+    dayNames.forEach(d => {  
+      const span = document.createElement("div");  
+      span.className = "fw-bold calendar-day-name";  
+      span.textContent = d;  
+      calendarEl.appendChild(span);  
+    });  
+
+    for (let i = 0; i < firstDay; i++) {  
+      const span = document.createElement("div");  
+      span.className = "calendar-day other-month";  
+      span.textContent = daysInPrev - firstDay + i + 1;  
+      calendarEl.appendChild(span);  
+    }  
+
+    for (let i = 1; i <= daysInMonth; i++) {  
+      const span = document.createElement("div");  
+      span.className = "calendar-day";  
+      span.textContent = i;  
+      if (i === today) span.classList.add("today");  
+      calendarEl.appendChild(span);  
+    }  
+  }  
+  renderCalendar();
+
+  // Apply styling directly (embedded)
+  const style = document.createElement("style");
+  style.textContent = `
+    .calendar-day-name {
+  font-size: 0.65rem;
+  color: #2d41af;
+  text-align: center;
+  font-weight: 600;
+}
+
+.calendar-day {
+  font-size: 0.55rem;
+  text-align: center;
+  padding: 3px;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+}
+
+.calendar-day.today {
+  background-color: #2d41af;
+  color: white;
+  font-weight: 600;
+}
+
+.calendar-day.other-month {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.calendar-day:hover {
+  background: rgba(45, 65, 175, 0.1);
+  transform: scale(1.05);
+}
+
+  `;
+  document.head.appendChild(style);
+
+
+
+
+const ctx = document.getElementById("inventoryChart").getContext("2d");
+let inventoryChart;
+
+function loadInventoryChart() {
+  const firebaseConfig = {
+    apiKey: "AIzaSyB1Gbmp2j2cTfnUmuWTjcL2ypauUpQn8Qc",
+    authDomain: "jahsportal.firebaseapp.com",
+    databaseURL: "https://jahsportal-default-rtdb.firebaseio.com",
+    projectId: "jahsportal",
+    storageBucket: "jahsportal.firebasestorage.app",
+    messagingSenderId: "798312139932",
+    appId: "1:798312139932:web:2f6654cdd82a23406ff159"
+  };
+
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  db.ref('inventory').once('value').then(snapshot => {
+    const data = snapshot.val();
+    if (!data) {
+      console.warn('No inventory data found');
+      return;
+    }
+
+    const labels = [];
+    const quantities = [];
+    const colors = [];
+
+    Object.values(data).forEach(item => {
+      const qty = item.qty || 0;
+      labels.push(item.name || "Unnamed");
+      quantities.push(qty);
+
+      // Dynamic color logic
+      if (qty < 50) colors.push("rgba(255, 99, 71, 0.9)");       // Red (<50)
+      else if (qty < 100) colors.push("rgba(255, 165, 0, 0.9)");  // Orange (50–99)
+      else colors.push("rgba(60, 95, 211, 0.9)");                 // Blue (≥100)
+    });
+
+    if (inventoryChart) inventoryChart.destroy();
+
+    inventoryChart = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Quantity",
+          data: quantities,
+          backgroundColor: colors,
+          borderColor: "#fff",
+          borderWidth: 6, // Bold ring
+          borderRadius: 5, // Slight rounding (not too soft)
+          hoverOffset: 25,
+          hoverBorderColor: "rgba(255, 255, 255, 0.9)",
+          spacing: 1 // Minimal spacing between slices
+        }]
+      },
+      options: {
+        responsive: true,
+        cutout: "45%", // Smaller cutout = thicker ring
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "rgba(0,0,0,0.85)",
+            titleFont: { size: 14, weight: "bold" },
+            bodyFont: { size: 13 },
+            padding: 10,
+            callbacks: {
+              label: (context) => {
+                const label = labels[context.dataIndex];
+                const qty = quantities[context.dataIndex];
+                return `${label}: ${qty}`;
+              }
+            }
+          }
+        },
+        animation: {
+          animateRotate: true,
+          animateScale: true,
+          duration: 1200,
+          easing: "easeOutQuart"
+        },
+        hover: {
+          mode: "nearest",
+          animationDuration: 600
+        }
+      }
+    });
+  }).catch(error => console.error("Error loading inventory:", error));
+}
+
+document.addEventListener("DOMContentLoaded", loadInventoryChart);
+
+
+
+
+    const userName = localStorage.getItem("userName") || "Guest";  
+    const role = localStorage.getItem("role") || "visitor";  
+    document.getElementById("welcome").innerHTML = `<small style="margin:0; font-weight:600">Welcome, ${userName} (${role})</small>`;  
+  </script>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1Gbmp2j2cTfnUmuWTjcL2ypauUpQn8Qc",
+      authDomain: "jahsportal.firebaseapp.com",
+      projectId: "jahsportal",
+      storageBucket: "jahsportal.firebasestorage.app",
+      messagingSenderId: "798312139932",
+      appId: "1:798312139932:web:2f6654cdd82a23406ff159",
+      databaseURL: "https://jahsportal-default-rtdb.firebaseio.com"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const db = firebase.database();
+
+
+    
+      // Render Announcements in Real-Time
+ // Render Announcements in Real-Time
+function renderAnnouncementsRealtime() {
+  const list = document.getElementById("announcementListContainer");
+  if (!list) {
+    console.error("announcementListContainer element not found.");
+    return;
+  }
+
+  list.innerHTML = '<li class="list-group-item">Loading announcements...</li>';
+
+  db.ref("announcements").on("value", snap => {
+    const data = snap.val();
+
+    if (!data) {
+      list.innerHTML = '<li class="list-group-item">No announcements found.</li>';
+      return;
+    }
+
+    list.innerHTML = "";
+
+    const announcements = Object.entries(data)
+      .map(([id, val]) => ({ id, ...val }))
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    announcements.forEach(ann => {
+      const li = document.createElement("li");
+      li.className = "list-group-item";
+      li.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(45, 65, 175, 0.05);
+        border: none;
+        border-left: 4px solid #2d41af;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+      `;
+
+      // Left: announcement text
+      const textSpan = document.createElement("span");
+      textSpan.textContent = ann.text || "";
+      textSpan.style.cssText = `
+        color: #2d41af;
+        font-weight: 600;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        display: inline-block;
+        width: 73%;
+      `;
+
+      // Right: poster info
+      const infoSmall = document.createElement("small");
+      infoSmall.innerHTML = `
+        Posted by: <b>${ann.name || "Unknown"}</b> on ${ann.timestamp || ""}
+      `;
+      infoSmall.style.cssText = `
+        color: #555;
+        font-style: italic;
+        min-width: 27%;
+        text-align: right;
+        flex-shrink: 0;
+      `;
+
+      li.appendChild(textSpan);
+      li.appendChild(infoSmall);
+      list.appendChild(li);
+    });
+  }, err => {
+    console.error("Firebase error on announcements listener:", err);
+    list.innerHTML = '<li class="list-group-item text-danger">Error loading announcements</li>';
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof db !== "undefined") {
+    renderAnnouncementsRealtime();
+  } else {
+    console.error("Firebase database 'db' is undefined");
+  }
+});
+
+
+
+function parseDate(dateStr) {
+  if (!dateStr) return new Date();
+  if (dateStr.includes("/")) {
+    const [day, month, year] = dateStr.split("/");
+    return new Date(`${year}-${month}-${day}`);
+  }
+  return new Date(dateStr);
+}
+
+
+
+
+// deployment
+function renderDeployments() {
+  const list = document.getElementById("deploymentList");
+  list.innerHTML = `<li class="list-group-item">Loading deployments...</li>`;
+
+  db.ref("deployments").once("value").then(snap => {
+    const allDeps = snap.val();
+    list.innerHTML = "";
+
+    if (!allDeps) {
+      list.innerHTML = `<li class="list-group-item">No deployments found.</li>`;
+      return;
+    }
+
+    const deployments = [];
+    snap.forEach(child => {
+      deployments.push(child.val());
+    });
+
+    if (deployments.length === 0) {
+      list.innerHTML = `<li class="list-group-item">No deployments available.</li>`;
+      return;
+    }
+
+    deployments.sort((a, b) => parseDate(b.startDate) - parseDate(a.startDate));
+
+    deployments.forEach(dep => {
+      const startDate = parseDate(dep.startDate);
+      const endDate = parseDate(dep.endDate);
+      const options = { month: "short", day: "numeric", year: "numeric" };
+
+      const startStr = startDate.toLocaleDateString("en-US", options);
+      const endStr = endDate.toLocaleDateString("en-US", options);
+      let status = " Pending";
+      if (dep.completed) status = " Completed";
+      else if (dep.accepted) status = " Accepted";
+
+      const li = document.createElement("li");
+      li.className = "list-group-item";
+      li.innerHTML = `
+        <div><strong>${startStr} - ${endStr}</strong></div>
+        <div>Location: ${dep.location || "N/A"}</div>
+        <div>Leader: ${dep.teamLeader || "N/A"}</div>
+        <div>Status: ${status}</div>
+      `;
+      list.appendChild(li);
+    });
+  }).catch(err => {
+    console.error("Error loading deployments:", err);
+    list.innerHTML = `<li class="list-group-item text-danger">Error loading deployments</li>`;
+  });
+}
+
+document.addEventListener("DOMContentLoaded", renderDeployments);
+
+</script>
+
+
+
+</body>
+</html>
+
+

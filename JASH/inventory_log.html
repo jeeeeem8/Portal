@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <title>JAHS Admin Dashboard - Inventory Logs</title>
+
+  <!-- Bootstrap 5 -->  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">  
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Lordicon -->  
+  <script src="https://cdn.lordicon.com/lordicon.js"></script>  
+
+  <style>
+    body {  
+      font-family: "Segoe UI", sans-serif;  
+      background: linear-gradient(135deg, #e4e7f6, #f4f6fc);  
+      overflow: hidden;  
+      margin: 0;
+    }  
+
+    /* Sidebar */    
+    .sidebar {  
+      width: 250px;  
+      height: 100vh;  
+      position: fixed;  
+      top: 0; left: 0;  
+      background: linear-gradient(180deg, #2f3b8f, #1d2b64);  
+      color: #fff;  
+      padding-top: 60px;  
+      box-shadow: 2px 0 15px rgba(0,0,0,0.2);  
+    }  
+
+    .sidebar a {  
+      color: #fff;  
+      padding: 14px 20px;  
+      display: flex;  
+      align-items: center;  
+      text-decoration: none;  
+      transition: all 0.3s ease;  
+      font-size: .93rem; 
+    }  
+
+    .sidebar a:hover {  
+      background: rgba(255,255,255,0.2);  
+      transform: translateX(10px) scale(1.05);  
+      border-radius: 8px;  
+    }  
+
+    .sidebar lord-icon {  
+      width: 28px;  
+      height: 28px;  
+      margin-right: 12px;  
+      filter: brightness(0) invert(1);  
+      transition: transform 0.4s ease;  
+    }  
+
+    .sidebar a:hover lord-icon {  
+      transform: rotate(15deg) scale(1.3);  
+    }  
+
+    /* Navbar */  
+    .navbar {  
+      margin-left: 250px;  
+      transition: all 0.3s ease;  
+    }  
+
+    /* Main content area */
+    .content {  
+      margin-left: 250px;  
+      margin-top: 56px; /* navbar height */  
+      height: calc(100vh - 56px);  
+      overflow-y: auto;  
+      padding: 20px;  
+    }
+
+    /* Table & log styles */
+    .log-add { color: #21963c; font-weight: bold; }
+    .log-deduct { color: #c81b1b; font-weight: bold;}
+    th { background: #364fc7; color: #fff; cursor: pointer;}
+    #printArea { display:none; }
+
+    /* Filters horizontal layout */
+    .filters-container {  
+      display: flex;  
+      flex-wrap: wrap;  
+      gap: 10px;  
+      align-items: center;  
+      margin-bottom: 15px;
+    }
+    .filters-container input,
+    .filters-container select,
+    .filters-container button {  
+      min-width: 150px;  
+    }
+
+    @media print {
+      body * { visibility: hidden !important; }
+      #printArea, #printArea * { visibility: visible !important; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <img src="jahslogo.png" style="height: 100px; margin-left: 20px" alt="logo">
+    <a href="admin_dashboard.html">
+      <lord-icon src="https://cdn.lordicon.com/osuxyevn.json" trigger="hover"></lord-icon>
+      Dashboard
+    </a>
+    <a href="deployment.html">
+      <lord-icon src="https://cdn.lordicon.com/abwrkdvl.json" trigger="hover"></lord-icon>
+      Deployment
+    </a>
+    <a href="inventory.html">
+      <lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover"></lord-icon>
+      Inventory
+    </a>
+    <a href="salary.html">
+      <lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="hover"></lord-icon>
+      Payroll
+    </a>
+    <a href="Announcement.html">
+      <lord-icon src="https://cdn.lordicon.com/hpivxauj.json" trigger="hover"></lord-icon>
+      Announcement
+    </a>
+    <a href="Manage_account_dashboard.html">
+      <lord-icon src="https://cdn.lordicon.com/dklbhvrt.json" trigger="hover"></lord-icon>
+      Manage Accounts
+    </a>
+    <a href="#">--------- History Logs --------</a>
+
+    <a href="deployment_log.html">
+      <lord-icon src="https://cdn.lordicon.com/abwrkdvl.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>
+      Deployment History Log
+    </a>
+
+    <a href="inventory_log.html">
+      <lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>
+      Inventory History Log
+    </a>
+
+    <a href="salary_logs.html">
+      <lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>
+      Salary History Log
+    </a>
+
+    <a href="Reports.html">
+      <lord-icon src="https://cdn.lordicon.com/wloilxuq.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>
+      Report History Log
+    </a>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand ms-3 fw-bold" href="#">JAHS Telecon Employee Web Portal</a>
+      <div class="dropdown ms-auto me-3">
+        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+          <lord-icon src="https://cdn.lordicon.com/ajkxzzfb.json" trigger="hover" style="width:28px;height:28px;margin-right:8px;"></lord-icon>
+          <span id="welcome">Loading...</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="#" onclick="logout()">Log out</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="content">
+
+    <h2 class="mb-4">Inventory Logs</h2>
+
+    <!-- Filters horizontal layout -->
+    <div class="filters-container">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search logs..." oninput="applyFilters()" />
+      <select id="actionFilter" class="form-select" onchange="applyFilters()">
+        <option value="">All Actions</option>
+        <option value="add">Add</option>
+        <option value="deduct">Deduct</option>
+      </select>
+      <select id="userFilter" class="form-select" onchange="applyFilters()">
+        <option value="">All Users</option>
+      </select>
+      <button class="btn btn-primary" onclick="printSelected()">Print Selected</button>
+    </div>
+
+    <!-- Inventory Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped" id="logTable">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" /></th>
+            <th onclick="sortTable('timestamp')">Date/Time</th>
+            <th onclick="sortTable('action')">Action</th>
+            <th onclick="sortTable('itemName')">Item Name</th>
+            <th onclick="sortTable('itemId')">Item ID</th>
+            <th onclick="sortTable('user')">User</th>
+            <th onclick="sortTable('qtyChange', true)">Change</th>
+            <th onclick="sortTable('previousQty', true)">Previous Qty</th>
+            <th onclick="sortTable('newQty', true)">New Qty</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="9" class="text-center">Loading logs...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="printArea"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+  <script>
+    function logout() {
+      firebase.auth().signOut().then(() => window.location.href = "/");
+    }
+
+    const userName = localStorage.getItem("userName") || "Guest";
+    const role = localStorage.getItem("role") || "visitor";
+    document.getElementById("welcome").innerHTML = `Welcome, ${userName} (${role})`;
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1Gbmp2j2cTfnUmuWTjcL2ypauUpQn8Qc",
+      authDomain: "jahsportal.firebaseapp.com",
+      databaseURL: "https://jahsportal-default-rtdb.firebaseio.com",
+      projectId: "jahsportal",
+      storageBucket: "jahsportal.firebasestorage.app",
+      messagingSenderId: "798312139932",
+      appId: "1:798312139932:web:2f6654cdd82a23406ff159"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let allLogs = [];
+    let sortState = { column: "timestamp", desc: true };
+
+    function renderLogs() {
+      const tbody = document.querySelector("#logTable tbody");
+      db.ref("inventory_logs").on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (!data) {
+          tbody.innerHTML = '<tr><td colspan="9" class="text-center">No inventory logs found.</td></tr>';
+          return;
+        }
+        allLogs = Object.entries(data).map(([key, val]) => ({ ...val, __key: key }));
+        populateUserFilter();
+        applyFilters();
+      }, (error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error loading logs',
+          text: error.message
+        });
+      });
+    }
+
+    function populateUserFilter() {
+      const userSet = new Set(allLogs.map(log => log.user).filter(Boolean));
+      const userFilter = document.getElementById("userFilter");
+      userFilter.innerHTML = `<option value="">All Users</option>` +
+        Array.from(userSet).sort().map(user => `<option value="${user}">${user}</option>`).join('');
+    }
+
+    function applyFilters() {
+      let logs = allLogs.slice();
+      const action = document.getElementById("actionFilter").value;
+      const user = document.getElementById("userFilter").value;
+      const search = document.getElementById("searchInput").value.trim().toLowerCase();
+      if(action) logs = logs.filter(l => l.action === action);
+      if(user) logs = logs.filter(l => l.user === user);
+      if(search) {
+        logs = logs.filter(l =>
+          (l.itemName ?? "").toLowerCase().includes(search) ||
+          (l.itemId ?? "").toLowerCase().includes(search) ||
+          (l.user ?? "").toLowerCase().includes(search) ||
+          (l.action ?? "").toLowerCase().includes(search) ||
+          String(l.qtyChange ?? "").toLowerCase().includes(search) ||
+          String(l.previousQty ?? "").toLowerCase().includes(search) ||
+          String(l.newQty ?? "").toLowerCase().includes(search) ||
+          (l.timestamp ? new Date(l.timestamp).toLocaleString().toLowerCase().includes(search) : false)
+        );
+      }
+      logs = sortLogs(logs, sortState.column, sortState.desc);
+      displayLogs(logs);
+    }
+
+    function sortTable(column, numeric=false) {
+      if(sortState.column===column) sortState.desc = !sortState.desc;
+      else { sortState.column=column; sortState.desc=true; }
+      applyFilters();
+    }
+
+    function sortLogs(data,column,desc=true) {
+      return data.slice().sort((a,b)=>{
+        let valA=a[column], valB=b[column];
+        if(column==="timestamp"){ valA=valA?new Date(valA):0; valB=valB?new Date(valB):0; }
+        if(valA==null) valA=''; if(valB==null) valB='';
+        if(typeof valA==="string" && typeof valB==="string"){ 
+          return desc? -valA.localeCompare(valB, undefined, {numeric}) : valA.localeCompare(valB, undefined,{numeric});
+        } else { return desc? valB-valA : valA-valB; }
+      });
+    }
+
+    function displayLogs(logs) {
+      const tbody=document.querySelector("#logTable tbody");
+      if(!logs.length){ tbody.innerHTML='<tr><td colspan="9" class="text-center">No logs match your filter.</td></tr>'; return; }
+      tbody.innerHTML = logs.map((log, idx) => `
+        <tr>
+          <td><input type="checkbox" class="rowCheckbox" value="${log.__key || idx}" /></td>
+          <td>${log.timestamp ? new Date(log.timestamp).toLocaleString() : "-"}</td>
+          <td>${log.action==="add"? "<span class='log-add'>In</span>":"<span class='log-deduct'>Out</span>"}</td>
+          <td>${log.itemName||"-"}</td>
+          <td>${log.itemId||"-"}</td>
+          <td>${log.user||"-"}</td>
+          <td>${log.qtyChange??"-"}</td>
+          <td>${log.previousQty??"-"}</td>
+          <td>${log.newQty??"-"}</td>
+        </tr>
+      `).join('');
+      document.getElementById("selectAll").checked=false;
+    }
+
+    function toggleSelectAll(box) {
+      document.querySelectorAll('.rowCheckbox').forEach(cb=>cb.checked=box.checked);
+    }
+
+    function printSelected() {
+      const checkboxes = document.querySelectorAll('.rowCheckbox:checked');
+      if(checkboxes.length===0){ 
+        Swal.fire({
+          icon: 'warning',
+          title: 'No selection',
+          text: 'Please select at least one row.'
+        });
+        return; 
+      }
+      const selectedKeys = Array.from(checkboxes).map(cb=>cb.value);
+      const selectedLogs = allLogs.filter((log, idx)=> selectedKeys.includes(log.__key || idx.toString()));
+      const printHTML = `
+        <h2>Selected Inventory Logs</h2>
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Date/Time</th>
+              <th>Action</th>
+              <th>Item Name</th>
+              <th>Item ID</th>
+              <th>User</th>
+              <th>Change</th>
+              <th>Previous Qty</th>
+              <th>New Qty</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${selectedLogs.map(log=>`
+              <tr>
+                <td>${log.timestamp?new Date(log.timestamp).toLocaleString():"-"}</td>
+                <td>${log.action==="add"? "<span class='log-add'>In</span>":"<span class='log-deduct'>Out</span>"}</td>
+                <td>${log.itemName||"-"}</td>
+                <td>${log.itemId||"-"}</td>
+                <td>${log.user||"-"}</td>
+                <td>${log.qtyChange??"-"}</td>
+                <td>${log.previousQty??"-"}</td>
+                <td>${log.newQty??"-"}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+      const printArea=document.getElementById("printArea");
+      printArea.innerHTML=printHTML;
+      printArea.style.display="block";
+      window.print();
+      printArea.style.display="none";
+    }
+
+    window.onload = renderLogs;
+  </script>
+
+</body>
+</html>

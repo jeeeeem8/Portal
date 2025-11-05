@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAHS Admin Dashboard</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Lordicon -->
+  <script src="https://cdn.lordicon.com/lordicon.js"></script>
+  <!-- Tabler Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #e4e7f6;
+    }
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      position: fixed;
+      top: 0; left: 0;
+      background: #2f3b8f;
+      color: #fff;
+      padding-top: 40px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+    .sidebar img {
+      height: 80px;
+      margin: 0 auto 20px auto;
+      display: block;
+    }
+    .sidebar a {
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 15px;
+      font-weight: 500;
+      border-radius: 8px;
+    }
+    .sidebar a:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateX(8px);
+    }
+    .sidebar lord-icon {
+      width: 30px;
+      height: 30px;
+      margin-right: 12px;
+      transition: transform 0.3s ease;
+    }
+    .sidebar a:hover lord-icon {
+      transform: scale(1.2) rotate(5deg);
+    }
+    /* Content */
+    .content {
+      margin-left: 250px;
+      padding: 20px;
+    }
+    .navbar {
+      margin-left: 250px;
+    }
+    .card {
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
+    /* Calendar Styles */
+    #liveDateTime {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #2f3b8f;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .calendar-grid div {
+      font-size: 1rem;
+      padding: 12px 0;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .calendar-day.other-month {
+      color: #aaa;
+    }
+    .calendar-day.today {
+      background: #2f3b8f;
+      color: white;
+      font-weight: bold;
+    }
+    /* Salary Card */
+    .salary-card {
+      background: #2f3b8f;
+      color: #fff;
+    }
+    .salary-card h5, .salary-card h1, .salary-card p {
+      color: #fff;
+    }
+    /* Lordicon inline size */
+    .card-title-icon {
+      width: 28px;
+      height: 28px;
+      margin-right: 8px;
+    }
+    /* Dashboard Header */
+    .dashboard-header {
+      background: #2f3b8f;
+      color: #fff;
+      padding: 30px 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+    }
+    .dashboard-header h2 {
+      font-weight: 700;
+      margin: 0;
+    }
+    .dashboard-header p {
+      margin: 5px 0 0;
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+<img src="jahslogo.png" style="height: 100px; margin-left: 20px" alt="logo">
+    <a href="team_dashboard.html"><lord-icon src="https://cdn.lordicon.com/osuxyevn.json" trigger="hover" colors="primary:#ffffff,secondary:#ffffff"></lord-icon> Dashboard</a>
+    <a href="teamleader_deployment.html"><lord-icon src="https://cdn.lordicon.com/abwrkdvl.json" trigger="hover" colors="primary:#ffffff,secondary:#ffffff"></lord-icon> Deployment</a>
+    <a href="teamleader_salary.html"><lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="hover" colors="primary:#ffffff,secondary:#ffffff"></lord-icon> Payroll</a>
+    <a href="teamleader_announcement.html"><lord-icon src="https://cdn.lordicon.com/hpivxauj.json" trigger="hover" colors="primary:#ffffff,secondary:#ffffff"></lord-icon> Announcement</a>
+    <a href="teamleader_attendance.html">
+      <lord-icon src="https://cdn.lordicon.com/zpxybbhl.json" trigger="hover" colors="primary:#ffffff"></lord-icon>
+      Attendance
+    </a> </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand ms-3 fw-bold" href="#">JAHS Telecon Employee Web Portal</a>
+      <div class="dropdown ms-auto me-3">
+        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+          <i class="ti ti-user-circle fs-4 me-2"></i> <span id="navbarUserName">Loading...</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="User_info.html"><i class="ti ti-id me-2"></i> Account Info</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="ti ti-logout me-2"></i> Log out</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="content mt-5 pt-3">
+    
+    <!-- Dashboard Title + Description -->
+    <div class="dashboard-header">
+      <h2><i class="ti ti-layout-dashboard me-2"></i> Dashboard</h2>
+      <p>Welcome to your employee dashboard. Track deployments, payroll, attendance, and announcements in one place.</p>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- Deployment -->
+<div class="col-lg-8">
+  <div class="card p-3 h-100" style="height: 440px; overflow: hidden;">
+    <h5><i class="ti ti-briefcase me-2"></i> Deployment</h5>
+    <ul id="deploymentList" class="list-group mt-2" style="max-height: 380px; overflow-y: auto;">
+      <li class="list-group-item">Loading deployments...</li>
+      <!-- More items will appear here -->
+    </ul>
+  </div>
+</div>
+
+
+      <!-- Calendar -->
+      <div class="col-lg-4">
+        <div class="card p-3 h-100">
+          <h5><i class="ti ti-calendar me-2"></i> Calendar</h5>
+          <div class="text-center mb-2" id="liveDateTime"></div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+      </div>
+
+      <div class="col-lg-6"style="height: 200px; overflow: hidden;">
+  <div class="card salary-card text-center p-4 h-100" style="height: 240px; overflow: hidden;">
+    <h5><i class="ti ti-cash me-2"></i> Salary</h5>
+    <h1 class="mt-3" id="salaryAmount">₱ 0</h1>
+    <p>Payroll</p>
+  </div>
+</div>
+    <!-- Announcements -->
+<div class="col-lg-6"style="height: 200px; overflow: hidden;">
+  <div class="card announcement-card p-3 h-100" style="height: 140px; overflow: hidden;">
+    <h5 class="d-flex align-items-center">
+      <lord-icon src="https://cdn.lordicon.com/megfpdmb.json" trigger="loop" delay="2000"
+        colors="primary:#2f3b8f" class="card-title-icon">
+      </lord-icon>
+      Announcements
+    </h5>
+    <ul id="announcementListContainer" class="list-group mt-2">
+      <li class="list-group-item">Loading announcements...</li>
+    </ul>
+  </div>
+</div>
+
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+
+    // Load user name from localStorage (saved during login)
+    document.addEventListener("DOMContentLoaded", () => {
+      const userName = localStorage.getItem("userName");
+      document.getElementById("navbarUserName").textContent = userName ? userName : "Unknown User";
+    });
+
+    // Logout with SweetAlert
+    function logout() {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will be logged out of the system.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#2f3b8f",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, log out"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.clear();
+          Swal.fire({
+            title: "Logged out!",
+            text: "Redirecting to welcome page...",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false
+          });
+          setTimeout(() => {
+            window.location.href = "welcome_page.html";
+          }, 1500);
+        }
+      });
+    }
+
+    // Live Date & Time
+    function updateLiveDateTime() {
+      const now = new Date();
+      const day = now.toLocaleDateString("en-US", { weekday: "long" });
+      const date = now.toLocaleDateString("en-US");
+      const time = now.toLocaleTimeString("en-US");
+      document.getElementById("liveDateTime").textContent = `${day}, ${date} ${time}`;
+    }
+    setInterval(updateLiveDateTime, 1000);
+    updateLiveDateTime();
+
+    // Calendar Renderer
+    function renderCalendar() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const today = now.getDate();
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysInPrev = new Date(year, month, 0).getDate();
+
+      const calendarEl = document.getElementById("calendarGrid");
+      calendarEl.innerHTML = "";
+
+      // Day headers
+      const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      dayNames.forEach(d => {
+        const span = document.createElement("div");
+        span.className = "fw-bold";
+        span.textContent = d;
+        calendarEl.appendChild(span);
+      });
+
+      // Previous month days
+      for (let i=0; i<firstDay; i++) {
+        const span = document.createElement("div");
+        span.className = "calendar-day other-month";
+        span.textContent = daysInPrev - firstDay + i + 1;
+        calendarEl.appendChild(span);
+      }
+
+      // Current month days
+      for (let i=1; i<=daysInMonth; i++) {
+        const span = document.createElement("div");
+        span.className = "calendar-day";
+        span.textContent = i;
+        if (i === today) span.classList.add("today");
+        calendarEl.appendChild(span);
+      }
+    }
+    renderCalendar();
+  </script>
+
+
+ <!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+  // ==============================
+  // Firebase Config (safe init)
+  // ==============================
+  const firebaseConfig = {
+    apiKey: "AIzaSyB1Gbmp2j2cTfnUmuWTjcL2ypauUpQn8Qc",
+    authDomain: "jahsportal.firebaseapp.com",
+    databaseURL: "https://jahsportal-default-rtdb.firebaseio.com",
+    projectId: "jahsportal",
+    storageBucket: "jahsportal.firebasestorage.app",
+    messagingSenderId: "798312139932",
+    appId: "1:798312139932:web:2f6654cdd82a23406ff159"
+  };
+  if (!firebase.apps?.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.database();
+
+  // ==============================
+  // Get logged user info
+  // ==============================
+  const rawName = localStorage.getItem("userName") || localStorage.getItem("name") || "";
+  const rawRole = localStorage.getItem("userRole") || localStorage.getItem("role") || "";
+  const userName = rawName.trim();
+  const userRole = rawRole.trim();
+
+  console.log("[debug] loggedName:", userName, "loggedRole:", userRole);
+
+  // ==============================
+  // Date parser (YYYY-MM-DD or dd/mm/yyyy)
+  // ==============================
+  function parseDate(dateStr) {
+    if (!dateStr) return new Date();
+    if (dateStr.includes("-")) return new Date(dateStr);
+    if (dateStr.includes("/")) {
+      const [d, m, y] = dateStr.split("/");
+      return new Date(`${y}-${m}-${d}`);
+    }
+    return new Date(dateStr);
+  }
+
+  // Pretty date
+  function pretty(date) {
+    try {
+      return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    } catch {
+      return date.toString();
+    }
+  }
+
+  // ==============================
+  // Render deployments (TeamLeader view) - latest first
+  // ==============================
+  function renderDeploymentsRealtime() {
+    const list = document.getElementById("deploymentList");
+    if (!list) {
+      console.error("deploymentList element not found in DOM.");
+      return;
+    }
+
+    // If not TeamLeader, stop
+    if (!userRole || userRole.toLowerCase() !== "teamleader") {
+      list.innerHTML = `<li class="list-group-item">Access denied — you must be logged in as Team Leader to view this.</li>`;
+      return;
+    }
+
+    // Realtime listener
+    db.ref("deployments").on("value", snap => {
+      const data = snap.val();
+      console.log("📦 deployments snapshot:", data);
+
+      list.innerHTML = ""; // clear list
+
+      if (!data) {
+        list.innerHTML = `<li class="list-group-item">No deployments found.</li>`;
+        return;
+      }
+
+      let deployments = [];
+
+      // Collect deployments assigned to this team leader
+      Object.entries(data).forEach(([key, dep]) => {
+        const depLeaderRaw = (dep.teamLeader || dep.teamleader || "").toString().trim();
+        const depLeader = depLeaderRaw.toLowerCase();
+        const loggedLeader = userName.toLowerCase();
+
+        if (depLeader === loggedLeader) {
+          deployments.push(dep);
+        }
+      });
+
+      if (deployments.length === 0) {
+        list.innerHTML = `<li class="list-group-item">No deployments assigned to you as Team Leader.</li>`;
+        return;
+      }
+
+      // Sort deployments by startDate descending (latest first)
+      deployments.sort((a, b) => parseDate(b.startDate || b.start) - parseDate(a.startDate || a.start));
+
+      // Render deployments
+      deployments.forEach(dep => {
+        const sd = parseDate(dep.startDate || dep.start || "");
+        const ed = parseDate(dep.endDate || dep.end || "");
+
+        let employees = [];
+        if (Array.isArray(dep.employees)) employees = dep.employees;
+        else if (dep.employees && typeof dep.employees === "object") employees = Object.values(dep.employees);
+        else if (typeof dep.employees === "string") employees = [dep.employees];
+
+        const status = dep.completed ? " Completed" : (dep.accepted ? " Accepted" : " Pending");
+
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.innerHTML = `
+          <div><strong>${pretty(sd)} to ${pretty(ed)}</strong></div>
+          <div>${dep.location || "No location provided"} | Status: ${status}</div>
+          <div><small>Employees: ${employees.length ? employees.join(", ") : "None"}</small></div>
+        `;
+        list.appendChild(li);
+      });
+    }, err => {
+      console.error("Firebase error on deployments listener:", err);
+      list.innerHTML = `<li class="list-group-item text-danger">Error loading deployments</li>`;
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    renderDeploymentsRealtime();
+  });
+</script>
+
+<!-- SALARY -->
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+const salaryAmount = document.getElementById("salaryAmount");
+const salaryTableBody = document.getElementById("salaryTableBody");
+
+// Wait for Firebase and DOM to be ready
+document.addEventListener("DOMContentLoaded", () => {
+  const firebaseConfig = {
+    apiKey: "AIzaSyB1Gbmp2j2cTfnUmuWTjcL2ypauUpQn8Qc",
+    authDomain: "jahsportal.firebaseapp.com",
+    databaseURL: "https://jahsportal-default-rtdb.firebaseio.com",
+    projectId: "jahsportal",
+    storageBucket: "jahsportal.firebasestorage.app",
+    messagingSenderId: "798312139932",
+    appId: "1:798312139932:web:2f6654cdd82a23406ff159"
+  };
+
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const teamLeaderName = localStorage.getItem("userName") || ""; // ← get currently logged in TL name
+
+  if (!teamLeaderName) {
+    Swal.fire("Error", "No logged-in user found.", "error");
+    return;
+  }
+
+  renderTeamLeaderSalary(db, teamLeaderName);
+});
+
+function renderTeamLeaderSalary(db, teamLeaderName) {
+  const salaryRef = db.ref("posted_salary_record");
+
+  salaryRef.on("value", snapshot => {
+    let totalTeamSalary = 0;
+    const latestRecordPerEmployee = {};
+
+    snapshot.forEach(child => {
+      const rec = child.val();
+      if (!rec || !rec.name || rec.role !== "Team Leader") return; // ✅ Only include Team Leader records
+
+      // ✅ Match only the current logged-in team leader
+      if (rec.name.toLowerCase() !== teamLeaderName.toLowerCase()) return;
+
+      const empKey = (rec.name + "|" + (rec.role || "")).toLowerCase();
+
+      // Keep only the latest record
+      if (
+        !latestRecordPerEmployee[empKey] ||
+        new Date(rec.postedAt) > new Date(latestRecordPerEmployee[empKey].postedAt)
+      ) {
+        latestRecordPerEmployee[empKey] = rec;
+      }
+    });
+
+    const uniqueRecords = Object.values(latestRecordPerEmployee);
+
+    // Compute total salary
+    totalTeamSalary = uniqueRecords.reduce(
+      (sum, rec) => sum + (Number(rec.totalSalary) || 0),
+      0
+    );
+
+    // ✅ Update displayed total
+    salaryAmount.innerText = `₱ ${totalTeamSalary.toLocaleString()}`;
+
+    // ✅ Render table rows (if a table exists)
+    if (salaryTableBody) {
+      salaryTableBody.innerHTML = "";
+      uniqueRecords.forEach(rec => {
+        const row = `
+          <tr>
+            <td>${rec.name}</td>
+            <td>${rec.role}</td>
+            <td>${rec.startDate} - ${rec.endDate}</td>
+            <td>₱ ${Number(rec.totalSalary).toLocaleString()}</td>
+          </tr>`;
+        salaryTableBody.innerHTML += row;
+      });
+    }
+  }, err => {
+    console.error("Error loading salary data:", err);
+    salaryAmount.innerText = "₱ 0";
+  });
+}
+</script>
+
+
+
+<!-- Announcement Script -->
+ <script>
+function renderAnnouncementsRealtime() {
+  const list = document.getElementById("announcementListContainer");
+  if (!list) {
+    console.error("announcementListContainer element not found.");
+    return;
+  }
+
+  // Clear list and show loading initially
+  list.innerHTML = '<li class="list-group-item">Loading announcements...</li>';
+
+  db.ref("announcements").on("value", snap => {
+    const data = snap.val();
+
+    if (!data) {
+      list.innerHTML = '<li class="list-group-item">No announcements found.</li>';
+      return;
+    }
+
+    list.innerHTML = "";
+
+    // Convert object to array and sort by timestamp descending
+    const announcements = Object.entries(data)
+      .map(([id, val]) => ({ id, ...val }))
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    announcements.forEach(ann => {
+      const li = document.createElement("li");
+      li.className = "list-group-item";
+
+      // Validate timestamp before formatting
+      const timeStr = ann.timestamp ? new Date(ann.timestamp).toLocaleString() : "";
+
+      // Show text and who posted (using ann.name)
+      li.innerHTML = `
+        <div>${ann.text || ""}</div>
+        <small class="text-muted">Posted by: ${ann.name || "Unknown"} on ${timeStr}</small>
+      `;
+      list.appendChild(li);
+    });
+  }, err => {
+    console.error("Firebase error on announcements listener:", err);
+    list.innerHTML = '<li class="list-group-item text-danger">Error loading announcements</li>';
+  });
+}
+
+// Run it after DOM loaded
+document.addEventListener("DOMContentLoaded", () => {
+  renderAnnouncementsRealtime();
+});
+
+
+
+ </script>
+
+</body>
+</html>

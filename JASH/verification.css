@@ -1,0 +1,40 @@
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f0f2f5;
+}
+
+.container {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  width: 350px;
+  text-align: center;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  background: #4285F4;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background: #357ae8;
+}
+
+.hidden {
+  display: none;
+}
+
+#message {
+  margin-top: 15px;
+  font-weight: bold;
+}

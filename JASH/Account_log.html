@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Accounts Directory | JAHS Telecon Admin</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Lordicon -->
+  <script src="https://cdn.lordicon.com/lordicon.js"></script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    /* BASIC PAGE */
+    body {
+      background: #f4f6fb;
+      font-family: "Segoe UI", sans-serif;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    /* SIDEBAR */
+    .sidebar {  
+      width: 250px;  
+      height: 100vh;  
+      position: fixed;  
+      top: 0; left: 0;  
+      background: linear-gradient(180deg, #2f3b8f, #1d2b64);  
+      color: #fff;  
+      padding-top: 60px;  
+      box-shadow: 2px 0 15px rgba(0,0,0,0.2);  
+      overflow-y: auto;
+      z-index: 1050;
+    }  
+
+    .sidebar a {  
+      color: #fff;  
+      padding: 14px 20px;  
+      display: flex;  
+      align-items: center;  
+      text-decoration: none;  
+      transition: all 0.3s ease;  
+      font-size: .93rem; 
+    }  
+
+    .sidebar img { 
+      height: 100px; 
+      display:block; 
+      margin:0 auto 14px; 
+    }
+
+    .sidebar a:hover { 
+      background: rgba(255,255,255,0.08); 
+      transform: translateX(6px); 
+      border-radius:8px; 
+    }
+
+    .sidebar lord-icon { 
+      width:24px; 
+      height:24px; 
+      filter: brightness(0) invert(1); 
+      margin-right:10px;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      margin-left:250px;
+      background:#fff;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      z-index: 1100;
+    }
+
+    .navbar-brand {
+      color:#1a237e !important;
+      font-weight:600;
+    }
+
+    /* CONTENT WRAPPER */
+    .content {
+      margin-left: 250px;
+      padding: 100px 30px 40px 30px;
+      min-height: calc(100vh - 80px);
+      background: #f5f8fc;
+      box-sizing: border-box;
+    }
+
+    h2 {
+      color: #364fc7;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .top-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: flex-end;
+    }
+
+    table {
+      width: 100%;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+      font-size: 15px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #364fc7;
+      color: #fff;
+      padding: 12px 8px;
+    }
+
+    td {
+      padding: 11px 8px;
+      border-bottom: 1px solid #e7eaf6;
+      vertical-align: middle;
+      color: #21316f;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .nowrap { white-space: nowrap; }
+
+    #liveDateTime {
+      color:#2a3aa0;
+      font-weight:600;
+      font-size:.95rem;
+    }
+
+    footer {
+      margin-left:250px; 
+      padding:12px; 
+      text-align:center; 
+      color:#666;
+      background:#fff;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+    }
+
+    @media (max-width:900px) {
+      .sidebar { width:72px; padding-top:16px; }
+      .navbar, .content, footer { margin-left:72px; }
+      .sidebar img { display:none; }
+      .sidebar a span { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <img src="jahslogo.png" alt="JAHS Logo">
+    
+    <a href="admin_dashboard.html">
+      <lord-icon src="https://cdn.lordicon.com/osuxyevn.json" trigger="hover"></lord-icon>
+      <span>Dashboard</span>
+    </a>
+
+    <a href="deployment.html">
+      <lord-icon src="https://cdn.lordicon.com/abwrkdvl.json" trigger="hover"></lord-icon>
+      <span>Deployment</span>
+    </a>
+
+    <a href="inventory.html">
+      <lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover"></lord-icon>
+      <span>Inventory</span>
+    </a>
+
+    <a href="salary.html">
+      <lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="hover"></lord-icon>
+      <span>Payroll</span>
+    </a>
+
+    <a href="Announcement.html">
+      <lord-icon src="https://cdn.lordicon.com/hpivxauj.json" trigger="hover"></lord-icon>
+      <span>Announcement</span>
+    </a>
+
+    <a href="Manage_account_dashboard.html">
+      <lord-icon src="https://cdn.lordicon.com/dklbhvrt.json" trigger="hover"></lord-icon>
+      <span>Manage Accounts</span>
+    </a>
+
+    <a href="#" style="pointer-events:none; opacity:0.8;">--------- History Logs --------</a>
+
+    <a href="deployment_log.html">
+      <lord-icon src="https://cdn.lordicon.com/abwrkdvl.json" trigger="hover"></lord-icon>
+      <span>Deployment History Log</span>
+    </a>
+
+    <a href="inventory_log.html">
+      <lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover"></lord-icon>
+      <span>Inventory History Log</span>
+    </a>
+
+    <a href="salary_logs.html">
+      <lord-icon src="https://cdn.lordicon.com/qhgmphtg.json" trigger="hover"></lord-icon>
+      <span>Salary History Log</span>
+    </a>
+
+    <a href="Reports.html">
+      <lord-icon src="https://cdn.lordicon.com/wloilxuq.json" trigger="hover"></lord-icon>
+      <span>Report History Log</span>
+    </a>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand ms-3 fw-bold" href="#">JAHS Telecon Employee Web Portal</a>
+
+      <div class="ms-auto me-3 d-flex align-items-center">
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+            <lord-icon 
+              src="https://cdn.lordicon.com/ajkxzzfb.json" 
+              trigger="hover" 
+              style="width:28px;height:28px;margin-right:8px"
+              colors="primary:#3a4bbf,secondary:#3a4bbf">
+            </lord-icon>
+            <span id="welcome">Loading...</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" id="logoutLink">Log out</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT AREA -->
+  <div class="content">
+    <div class="top-bar">
+      <button type="button" class="btn btn-secondary" style="display: none;" onclick="window.history.back()">Back</button>
+      <button type="button" class="btn btn-danger"style="display: none;" id="logoutBtn">Logout</button>
+    </div>
+
+    <h2>Accounts Directory</h2>
+    <div style="overflow-x:auto;">
+      <table id="accountsTable" class="table">
+        <thead>
+          <tr>
+            <th>Account #</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Contact</th>
+            <th>Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+
+  <!-- BOOTSTRAP -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JS -->
+  <script>
+    // Firebase init
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1Gbmp2j2cTfnUmuWTjcL2ypauUpQn8Qc",
+      authDomain: "jahsportal.firebaseapp.com",
+      databaseURL: "https://jahsportal-default-rtdb.firebaseio.com",
+      projectId: "jahsportal",
+      storageBucket: "jahsportal.firebasestorage.app",
+      messagingSenderId: "798312139932",
+      appId: "1:798312139932:web:2f6654cdd82a23406ff159"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Load accounts
+    function loadAccounts() {
+      const tbody = document.querySelector("#accountsTable tbody");
+      db.ref("accounts").once("value").then(snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No accounts found.</td></tr>';
+          return;
+        }
+        const rows = Object.values(data).map(acc => `
+          <tr>
+            <td class="nowrap">${acc.accountNumber || "-"}</td>
+            <td>${acc.name || "-"}</td>
+            <td>${acc.email || "-"}</td>
+            <td>${acc.role || "-"}</td>
+            <td>${acc.contact || "-"}</td>
+            <td>${acc.address || "-"}</td>
+          </tr>
+        `).join("");
+        tbody.innerHTML = rows;
+      }).catch(err => {
+        tbody.innerHTML = '<tr><td colspan="6" style="color:red;text-align:center;">Error loading data.</td></tr>';
+        console.error(err);
+      });
+    }
+
+    loadAccounts();
+
+    // Welcome
+    const loggedName = localStorage.getItem("userName") || "Guest";
+    const loggedRole = localStorage.getItem("role") || "visitor";
+    document.getElementById("welcome").textContent = `Welcome, ${loggedName} (${loggedRole})`;
+
+    // Logout buttons
+    document.getElementById("logoutLink").addEventListener("click", logoutAction);
+    document.getElementById("logoutBtn").addEventListener("click", logoutAction);
+
+    function logoutAction() {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will be logged out of the system.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#364fc7",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, log out",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.clear();
+          Swal.fire({ title: "Logged out!", text: "Redirecting...", icon: "success", timer: 1000, showConfirmButton:false });
+          setTimeout(()=> window.location.href = "welcome_page.html", 1100);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
